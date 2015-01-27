@@ -1,0 +1,559 @@
+#+TITLE: Emacs configuration
+#+AUTHOR: June Tate-Gans
+#+EMAIL: june@theonelab.com
+#+OPTIONS: toc:3 num:nil ^:nil
+
+# table of contents down to level 2
+# no section numbers
+# don't use TeX syntax for sub and superscripts
+# See http://orgmode.org/manual/Export-options.html
+
+* Emacs config in =org-mode=
+
+Shamelessly templated after [[mailto:seth@userprimary.net][Seth Falcon]]'s [[http://raw.githubusercontent.com/seth/my-emacs-dot-d/master/emacs-init.org][emacs-init.org]] on GitHub. Great idea,
+Seth!
+
+Just stick this in the [[~/.emacs.d/init.el][init.el]]:
+
+#+BEGIN_EXAMPLE
+;; Emacs initialization is handled in the init.org file.
+(org-babel-load-file (expand-file-name "emacs-init.org" user-emacs-directory))
+#+END_EXAMPLE
+
+* Customize custom file
+
+Force custom settings to custom.el instead of init.el. I do this so that source
+control can just manage init.el and init.org. Customize tends to mangle elisp
+sources, which would cause a great deal of extra pain when managing this mess.
+
+#+BEGIN_SRC emacs-lisp
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+#+END_SRC
+
+* Defuns
+
+** My Custom Defuns
+
+#+BEGIN_SRC emacs-lisp
+  (defun jtg:jump-to-or-start-term (num)
+    "Function to force the current window to switch to or restart the given term
+    number."
+    (interactive)
+    (let* ((raw-buffer-name (format "ansiterm-%d" num))
+           (actual-buffer-name (concat "*" raw-buffer-name "*")))
+      (if (member actual-buffer-name (mapcar 'buffer-name (buffer-list)))
+          (switch-to-buffer actual-buffer-name)
+        (ansi-term (getenv "SHELL") raw-buffer-name))))
+
+  (defun jtg:toggle-term-mode ()
+    "Toggle the current term's input method between char and line mode."
+    (interactive)
+    (if (term-in-line-mode)
+        (term-char-mode)
+      (term-line-mode)))
+
+  (defun jtg:host-onlinep (host &optional port)
+    "Check to see if this emacs instance can connect to given HOST on PORT.
+
+    If PORT is not specified, then it defaults to 80."
+    (when (null port) (setq port 80))
+    (not (condition-case nil
+             (delete-process
+              (make-network-process :name "jtg:onlinep-check"
+                                    :host host
+                                    :service port))
+           (error t))))
+
+  (defun halt ()
+    "Saves buffers and kills emacs."
+    (interactive)
+    (save-some-buffers)
+    (kill-emacs))
+
+  (defun insert-date ()
+    (interactive)
+    (insert (format-time-string "%a %b %e, %Y")))
+
+  (defun insert-time ()
+    (interactive)
+    (insert (format-time-string "%I:%M:%S %z")))
+
+  (defun insert-timestamp ()
+    (interactive)
+    (insert-date)
+    (insert " ")
+    (insert-time))
+#+END_SRC
+
+** Hook Defuns
+
+#+BEGIN_SRC emacs-lisp
+  (defun jtg:lambda-to-λ ()
+    "Adds font-lock keywords to convert the word lambda into the actual character."
+    (font-lock-add-keywords
+     nil `(("(\\(lambda\\>\\)"
+            (0 (progn (compose-region (match-beginning 1) (match-end 1)
+                                      ,(make-char 'greek-iso8859-7 107))
+                      nil))))))
+#+END_SRC
+
+** Borrowed Defuns
+
+#+BEGIN_SRC emacs-lisp
+#+END_SRC
+
+* Add-on Packages
+
+I use John Wiegley's =[[https://github.com/jwiegley/use-package][use-package]]= to help config/install packages that may or
+may not be present on the current system. This makes use of [[http://melpa.milkbox.net/][MELPA]]'s package
+repository to slurp packages down via =package.el=.
+
+** package.el setup
+
+I prefer MELPA as my first source of truth, followed by org and then GNU. We
+only update the list of packages if and only if we're online and can reach
+MELPA.
+
+#+BEGIN_SRC emacs-lisp
+  (require 'package)
+
+  (setq package-archives '(("melpa" . "http://melpa.milkbox.net/packages/")
+                           ("org"   . "http://orgmode.org/elpa/")
+                           ("gnu"   . "http://elpa.gnu.org/packages/")))
+
+  (when (jtg:host-onlinep "melpa.milkbox.net")
+    (package-refresh-contents))
+
+  (package-initialize)
+#+END_SRC
+
+** Packages and their configs
+
+Quick reference to =use-package=:
+  - =:ensure= :: forces a package to be installed if it hasn't been already.
+  - =:init= :: does configuration of a package, even when the package loading is
+             deferred.
+  - =:config= :: does configuration of a package only after the module has been
+               loaded.
+  - =:bind= :: sets up keybindings and autoloads for the given functions they
+             call.
+  - =:mode= :: ??? FIXME
+  - =:load-path= :: ??? FIXME
+
+*** =use-package.el=
+
+This is a little unique since there's a bootstrapping problem here. Instead of
+using =use-package= to install =use-package=, I do a quick hack around it
+instead to check if it's available and install it directly if not.
+
+#+BEGIN_SRC emacs-lisp
+  (unless (require 'use-package nil t)
+    (package-install 'req-package)
+    (require 'req-package))
+#+END_SRC
+
+*** Solarized theme
+
+#+BEGIN_SRC emacs-lisp
+  (use-package color-theme-sanityinc-solarized
+    :ensure
+    :config
+    (load-theme 'sanityinc-solarized-dark t))
+#+END_SRC
+
+*** Custom Google[x] theme :TODO:
+
+*** magit
+
+#+BEGIN_SRC emacs-lisp
+  (use-package magit
+    :ensure
+    :bind ("C-x g" . magit-status))
+#+END_SRC
+
+*** ggtags
+
+#+BEGIN_SRC emacs-lisp
+  (use-package ggtags
+    :ensure)
+#+END_SRC
+
+*** Org mode
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org
+    :ensure
+    :mode ("\\.org$" . org-mode)
+    :bind (("C-c c" . org-capture)
+           ("C-c l" . org-store-link))
+    :init
+    (setq org-directory             "~/Notebook/org"
+          org-default-notes-file    "~/Notebook/org/notes.org"
+          org-enforce-todo-dependencies t
+          org-display-custom-times t
+          org-time-stamp-custom-formats '("<%m/%d/%y %a>" . "<%m/%d/%y %a %H:%M>")
+          org-deadline-warning-days 14
+          org-reverse-note-order t
+          org-return-follows-link t
+
+          org-special-ctrl-a/e t
+          org-special-ctrl-k t
+
+          org-refile-use-outline-path 'file
+          org-refile-allow-creating-parent-nodes 'confirm
+          org-refile-targets '((org-agenda-files :maxlevel . 1)
+                               (nil :maxlevel . 1))
+
+          org-src-fontify-natively t
+          org-src-lang-modes '(("elisp" . emacs-lisp)
+                               ("dot"   . fundamental))))
+#+END_SRC
+
+**** =org-capture=
+
+I keep notes for various TODOs, misc notes, and even notes for 1:1 meetings with
+folks.
+
+#+BEGIN_SRC emacs-lisp
+  (defvar jtg:current-one-on-one nil
+    "The name of the org file used for notes for the current 1:1.")
+
+  (defun jtg:capture-one-on-one ()
+    "Sets up a capture for a 1:1 meeting with a given person."
+    (interactive "sWho: ")
+    (setq current-one-on-one (concat org-directory "/1:1/" who ".org"))
+    (org-capture nil "1"))
+
+  (use-package org-capture
+    :bind (("C-c c" . org-capture)
+           ("C-c C" . jtg:capture-one-on-one))
+    :init
+    (setq org-capture-templates '(("t" "Todo" entry (file+headline "~/Notebook/org/agenda.org" "Unfiled Tasks"))
+                                  ("n" "Note" entry (file+datetree "~/Notebook/org/notes.org" "* %u %?"))
+                                  ("1" "1:1 Note" entry (file+datetree current-one-on-one "* [%<%d-%b-%Y %H:%M>] %?\n%i\n")))))
+#+END_SRC
+
+**** =org-agenda=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org-agenda
+    :bind (("C-c a" . org-agenda))
+    :init
+    (setq org-agenda-files '("~/Notebook/org/agenda.org")
+          org-agenda-resore-windows-after-quit t
+          org-agenda-skip-deadline-if-done t
+          org-agenda-skip-scheduled-if-done t
+          org-agenda-start-on-weekday nil
+          org-agenda-span 'week
+          org-agenda-custom-commands '(("d" "Delegated tasks" todo "DELEGATED" nil)
+                                       ("c" "Completed tasks" todo "DONE|DEFERRED|CANCELLED" nil)
+                                       ("w" "Blocked tasks" todo "WAITING" nil)
+                                       ("W" "21-day view" agenda "" ((org-agenda-span 21)))
+                                       ("A" "High priority tasks for today" agenda ""
+                                        ((org-agenda-skip-function (lambda () (org-agenda-skip-entry-if 'notregexp "\\=.*\\[#A\\]")))
+                                         (org-agenda-span 'day)
+                                         (org-agenda-overriding-header "Today's Priority #A tasks: ")))
+                                       ("S" "Last week's snippet" tags "TODO=\"DONE\"+CLOSED>=\"<-1w>\"|TODO=\"STARTED\""
+                                        ((org-agenda-overriding-header "Last week's completed TODOs: ")))
+                                       ("u" "Unscheduled tasks" alltodo ""
+                                        ((org-agenda-skip-function (lambda () (org-agenda-skip-entry-if 'scheduled 'deadline 'regexp "<[^>\n]+>")))
+                                         (org-agenda-overriding-header "Unscheduled TODO entries: "))))))
+#+END_SRC
+
+**** =org-mobile=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org-mobile
+    :init
+    (setq org-mobile-inbox-for-pull "~/Notebook/org/from-mobile.org"
+          org-mobile-directory      "~/Dropbox/MobileOrg"))
+#+END_SRC
+
+*** =company-mode=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+    :ensure)
+
+  (global-company-mode)
+#+END_SRC
+
+*** =footnote-mode=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package footnote-mode
+    :config
+    (setq footnote-prefix (kbd "C-c f")
+          footnote-section-tag ""
+          footnote-narrow-to-footnote-when-editing t
+          footnote-spaced-footnotes nil))
+#+END_SRC
+
+*** =markdown-mode=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package markdown-mode
+    :ensure
+    :mode (("\\.text\\'" . markdown-mode)
+           ("\\.markdown\\'" . markdown-mode)
+           ("\\.md\\'" . markdown-mode)))
+#+END_SRC
+
+*** =js2-mode=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package js2-mode
+    :ensure
+    :mode ("\\.js$" . js2-mode)
+    :config
+    (setq js2-basic-offset 4
+          js2-mirror-mode nil
+          js2-indent-on-enter-key t
+          js2-mode-squeeze-spaces nil
+          js2-highlight-level 3
+          js2-cleanup-whitespace t
+          js2-enter-indents-newline t))
+#+END_SRC
+
+*** rcirc
+
+#+BEGIN_SRC emacs-lisp
+
+#+END_SRC
+
+* Non-package Key Bindings
+
+This is where I stuff arbitrary one-off keybindings that should have been in
+emacs from the get-go.
+
+#+BEGIN_SRC emacs-lisp
+  (require 'bind-key)
+  (bind-keys ("M-\""  . insert-pair)
+             ("M-'"   . insert-pair)
+             ("M-["   . insert-pair)
+             ("M-{"   . insert-pair)
+             ("C-c C-'" . (lambda () (interactive) (insert "`")))
+
+             ("C-c q" . auto-fill-mode)
+
+             ("C-s"   . isearch-forward-regexp)
+             ("C-r"   . isearch-backward-regexp)
+             ("M-%"   . query-replace-regexp)
+
+             ("M-SPC" . pop-mark)
+
+             ("M-F" . subword-forward)
+             ("M-B" . subword-backward)
+
+             ("M-z" . zap-up-to-char)
+             
+             ("C-c t 0" . (lambda () (interactive) (jtg:jump-to-or-start-term 0)))
+             ("C-c t 1" . (lambda () (interactive) (jtg:jump-to-or-start-term 1)))
+             ("C-c t 2" . (lambda () (interactive) (jtg:jump-to-or-start-term 2)))
+             ("C-c t 3" . (lambda () (interactive) (jtg:jump-to-or-start-term 3)))
+             ("C-c t 4" . (lambda () (interactive) (jtg:jump-to-or-start-term 4)))
+             ("C-c t 5" . (lambda () (interactive) (jtg:jump-to-or-start-term 5)))
+             ("C-c t 6" . (lambda () (interactive) (jtg:jump-to-or-start-term 6)))
+             ("C-c t 7" . (lambda () (interactive) (jtg:jump-to-or-start-term 7)))
+             ("C-c t 8" . (lambda () (interactive) (jtg:jump-to-or-start-term 8)))
+             ("C-c t 9" . (lambda () (interactive) (jtg:jump-to-or-start-term 9))))
+
+  ;; Generally, it makes no sense to suspend emacs when emacs can do /everything/.
+  (global-unset-key "\C-z")
+#+END_SRC
+
+* General Emacs Tweaks
+
+Things that don't relate to packages or are generalized emacs settings go here.
+
+** Stop Emacs from GCing the world
+
+#+BEGIN_SRC emacs-lisp
+  ;; Keep emacs from stopping the world all that often.
+  (setq-default gc-cons-threshold 10000000)
+#+END_SRC
+
+** Tabs
+
+Tabs are evil, but we still have to live with them.
+
+#+BEGIN_SRC emacs-lisp
+  (setq-default indent-tabs-mode nil
+                tab-width 4)
+#+END_SRC
+
+** Fringe settings
+
+#+BEGIN_SRC emacs-lisp
+  (setq-default indicate-empty-lines t
+                indicate-buffer-boundaries t)
+#+END_SRC
+
+** No scroll, menu, or anything bars
+
+#+BEGIN_SRC emacs-lisp
+  (setq default-frame-alist '((menu-bar-lines . 0)
+                              (tool-bar-lines . 0)
+                              (vertical-scroll-bars)))
+#+END_SRC
+
+** URL browsing
+
+I should make this platform dependent.
+
+#+BEGIN_SRC emacs-lisp
+  (setq browse-url-browser-function 'browse-url-generic
+        browse-url-generic-program "xdg-open")
+#+END_SRC
+
+** Enable =narrow-to-region=
+
+Really, really handy, though confusing to folks who accidentally type in
+=C-x n n=. Emacs will auto-set this in [[~/.emacs.d/custom.el][custom.el]] on first use, but I didn't feel
+like that was necessary. Just adds extra problems to source control.
+
+#+BEGIN_SRC emacs-lisp
+  (put 'narrow-to-region 'disabled nil)
+#+END_SRC
+
+** Revert a buffer when the underlying file changes
+
+#+BEGIN_SRC emacs-lisp
+(global-auto-revert-mode t)
+#+END_SRC
+
+** Re-use current =dired= buffer
+
+=dired= has this really nifty feature where if you open the dir at point with
+=RET= it will re-use the existing buffer instead of spewing buffers all over the
+place.
+
+#+BEGIN_SRC emacs-lisp
+  (setq dired-find-subdir t)
+#+END_SRC
+
+** Backup files to backup dir
+
+#+BEGIN_SRC emacs-lisp
+  ;; store autosave files in tmp
+  (setq auto-save-file-name-transforms
+        `((".*" ,temporary-file-directory t)))
+
+  ;; store backups in the backup dir
+  (setq backup-by-copying t
+        backup-directory-alist '(("." . "~/.emacs.d/backups"))
+        delete-old-versions t
+        kept-new-versions 24
+        kept-old-version 12
+        version-control t)
+
+  ;; stop dropping nuisance lockfiles everywhere
+  (setq create-lockfiles nil)
+#+END_SRC
+
+** Make URLs in Man clickable
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'Man-mode-hook 'goto-address)
+#+END_SRC
+
+** Input methods
+
+I like to type in Japanese, so let's tell MULE about that.
+
+#+BEGIN_SRC emacs-lisp
+  (setq default-input-method "japanese-hiragana")
+#+END_SRC
+
+** Misc settings
+
+#+BEGIN_SRC emacs-lisp
+  (setq-default fill-column 80
+                column-number-mode 1
+                confirm-kill-emacs 'y-or-n-p
+                transient-mark-mode nil
+                require-final-newline t
+                scroll-conservatively 101
+                truncate-lines t)
+
+  (setq parens-require-spaces nil
+        make-backup-files nil
+        diff-switches "-u"
+        inhibit-splash-screen t
+        visible-bell 1
+        blink-cursor-blinks -1)
+
+  (display-time)
+  (show-paren-mode t)
+  (blink-cursor-mode t)
+  (prefer-coding-system 'utf-8)
+#+END_SRC
+
+* Programming Customizations
+** Emacs Lisp
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'emacs-lisp-mode-hook 'jtg:lambda-to-λ)
+  (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
+  (add-hook 'lisp-interaction-mode-hook 'eldoc-mode)
+#+END_SRC
+
+** C programming
+
+#+BEGIN_SRC emacs-lisp
+  (eval-after-load 'cc-mode
+    '(progn
+       (setq-default c-indent-level 4
+                     c-basic-offset 4
+                     c-syntactic-indentation t)
+       (c-set-offset 'case-label '+)
+       (c-set-offset 'access-label '-2)
+       (c-set-offset 'innamespace '0)
+
+       (bind-keys :map c-mode-map
+                  ("RET" 'newline-and-indent))))
+#+END_SRC
+
+* Other Customizations
+** =ansi-term= terminal tweaks
+
+#+BEGIN_SRC emacs-lisp
+  (eval-after-load 'term
+    '(progn (bind-keys :map term-mode-map
+               ("C-c C-j" . jtg:toggle-term-mode)
+               ("C-c C-k" . jtg:toggle-term-mode))
+        (bind-keys :map term-raw-map
+               ("C-c C-j" . jtg:toggle-term-mode)
+               ("C-c C-k" . jtg:toggle-term-mode))))
+#+END_SRC
+
+** Uniqueify buffer names
+
+#+BEGIN_SRC emacs-lisp
+  (require 'uniquify)
+
+  (setq uniquify-buffer-name-style 'forward
+        uniquify-separator "/"
+        uniquify-after-kill-buffer-p t
+        uniquify-ignore-buffers-re "^\\*")
+#+END_SRC
+
+** Remember minibuffer history
+
+#+BEGIN_SRC emacs-lisp
+  (setq savehist-additional-variables '(search ring regexp-search-ring)
+        savehist-autosave-interval 60
+        savehist-file (concat user-emacs-directory "savehist"))
+
+  (savehist-mode t)
+#+END_SRC
+
+** Remember recent files
+
+#+BEGIN_SRC emacs-lisp
+  (setq recentf-save-file (concat user-emacs-directory "recentf")
+        recentf-max-saved-items 200
+        recentf-max-menu-items 15)
+
+  (recentf-mode t)
+#+END_SRC
