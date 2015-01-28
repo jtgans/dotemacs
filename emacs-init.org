@@ -9,56 +9,13 @@
 # don't use TeX syntax for sub and superscripts
 # See http://orgmode.org/manual/Export-options.html
 
-* Table of Contents                                                     :TOC:
- - [[#emacs-config-in-org-mode][Emacs config in =org-mode=]]
- - [[#super-early-customization][Super early customization]]
- - [[#customize-custom-file][Customize custom file]]
- - [[#local-elisp-packages][Local elisp packages]]
- - [[#custom-googlex-theme][Custom Google<x> theme]]
- - [[#platform-specific-fixes][Platform-specific fixes]]
-     - [[#macos-x][MacOS X]]
- - [[#defuns][Defuns]]
-     - [[#my-custom-defuns][My Custom Defuns]]
-     - [[#unity-defuns][Unity Defuns]]
-     - [[#borrowed-defuns][Borrowed Defuns]]
- - [[#add-on-packages][Add-on Packages]]
-     - [[#packageel-setup][package.el setup]]
-     - [[#packages-and-their-configs][Packages and their configs]]
- - [[#non-package-key-bindings][Non-package Key Bindings]]
-     - [[#emacs-editing-adjustments][Emacs editing adjustments]]
-     - [[#disable-suspend][Disable suspend]]
-     - [[#personal-jump-map][Personal Jump Map]]
-     - [[#ansi-term-multi-instance-keymap][=ansi-term= multi instance keymap]]
- - [[#general-emacs-tweaks][General Emacs Tweaks]]
-     - [[#stop-emacs-from-gcing-the-world][Stop Emacs from GCing the world]]
-     - [[#tabs][Tabs]]
-     - [[#fringe-settings][Fringe settings]]
-     - [[#enable-narrow-to-region][Enable =narrow-to-region=]]
-     - [[#revert-a-buffer-when-the-underlying-file-changes][Revert a buffer when the underlying file changes]]
-     - [[#re-use-current-dired-buffer][Re-use current =dired= buffer]]
-     - [[#backup-files-to-backup-dir][Backup files to backup dir]]
-     - [[#make-urls-in-man-clickable][Make URLs in Man clickable]]
-     - [[#input-methods][Input methods]]
-     - [[#misc-settings][Misc settings]]
- - [[#programming-customizations][Programming Customizations]]
-     - [[#emacs-lisp][Emacs Lisp]]
-     - [[#cc-programming][C/C++ programming]]
-     - [[#generalized-programming-settings][Generalized Programming Settings]]
- - [[#text-customizations][Text Customizations]]
-     - [[#single-space-sentences][Single-space sentences]]
-     - [[#auto-fill-for-text-mode-][Auto fill for text mode ]]
- - [[#other-customizations][Other Customizations]]
-     - [[#ansi-term-terminal-tweaks][=ansi-term= terminal tweaks]]
-     - [[#uniqueify-buffer-names][Uniqueify buffer names]]
-     - [[#remember-bits-of-history][Remember bits of history]]
-     - [[#remember-recent-files][Remember recent files]]
+* Emacs config in org-mode
 
-* Emacs config in =org-mode=
+This org file is shamelessly templated after [[mailto:seth@userprimary.net][Seth Falcon]]'s [[http://raw.githubusercontent.com/seth/my-emacs-dot-d/master/emacs-init.org][emacs-init.org]] on
+GitHub. Great idea, Seth!
 
-Shamelessly templated after [[mailto:seth@userprimary.net][Seth Falcon]]'s [[http://raw.githubusercontent.com/seth/my-emacs-dot-d/master/emacs-init.org][emacs-init.org]] on GitHub. Great idea,
-Seth!
-
-Just stick this in the [[~/.emacs.d/init.el][init.el]]:
+I wrote a bunch of extra elisp to load the org file, though. Just stick this in
+the [[~/.emacs.d/init.el][init.el]]:
 
 #+BEGIN_EXAMPLE emacs-lisp
   ;; Emacs initialization is handled in the init.org file.
