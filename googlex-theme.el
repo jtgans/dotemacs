@@ -5,6 +5,7 @@
  'googlex
 
  '(default ((((min-colors 257)) (:background "#3f464c" :foreground "#eeeeec"))
+            (((min-colors 100)) (:background "#1b1b1b" :foreground "#eeeeec"))
             (t (:background "#00000" :foreground "#eeeeec"))))
  '(cursor ((t (:background "#fce94f"))))
  '(border ((t (:foreground "#ffffff"))))
