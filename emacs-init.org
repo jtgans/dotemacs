@@ -2,6 +2,7 @@
 #+AUTHOR: June Tate-Gans
 #+EMAIL: june@theonelab.com
 #+OPTIONS: toc:3 num:nil ^:nil
+#+STARTUP: contents
 
 # table of contents down to level 2
 # no section numbers
