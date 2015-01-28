@@ -161,11 +161,11 @@ here if I can.
 ** My Custom Defuns
 
 #+BEGIN_SRC emacs-lisp
-  (defun jtg:jump-to-or-start-term (num)
+  (defun jtg:jump-to-or-start-term (ch)
     "Function to force the current window to switch to or restart the given term
-    number."
-    (interactive)
-    (let* ((raw-buffer-name (format "ansiterm-%d" num))
+  character."
+    (interactive "c")
+    (let* ((raw-buffer-name (format "ansiterm-%c" ch))
            (actual-buffer-name (concat "*" raw-buffer-name "*")))
       (if (member actual-buffer-name (mapcar 'buffer-name (buffer-list)))
           (switch-to-buffer actual-buffer-name)
@@ -962,19 +962,7 @@ I find it really handy to have multiple =ansi-term= sessions running at once in
 emacs -- especially when it's daemonized.
 
 #+BEGIN_SRC emacs-lisp
-  (bind-keys :prefix-map jtg:term-map
-             :prefix-docstring "Keymap used to jump between multiple ansi-term instances."
-             :prefix "C-c t"
-             ("0" . (lambda () (interactive) (jtg:jump-to-or-start-term 0)))
-             ("1" . (lambda () (interactive) (jtg:jump-to-or-start-term 1)))
-             ("2" . (lambda () (interactive) (jtg:jump-to-or-start-term 2)))
-             ("3" . (lambda () (interactive) (jtg:jump-to-or-start-term 3)))
-             ("4" . (lambda () (interactive) (jtg:jump-to-or-start-term 4)))
-             ("5" . (lambda () (interactive) (jtg:jump-to-or-start-term 5)))
-             ("6" . (lambda () (interactive) (jtg:jump-to-or-start-term 6)))
-             ("7" . (lambda () (interactive) (jtg:jump-to-or-start-term 7)))
-             ("8" . (lambda () (interactive) (jtg:jump-to-or-start-term 8)))
-             ("9" . (lambda () (interactive) (jtg:jump-to-or-start-term 9))))
+  (bind-key "C-c t" #'jtg:jump-to-or-start-term)
 #+END_SRC
 
 * General Emacs Tweaks
