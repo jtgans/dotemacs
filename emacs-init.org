@@ -181,7 +181,7 @@ here if I can.
   (defun jtg:host-onlinep (host &optional port)
     "Check to see if this emacs instance can connect to given HOST on PORT.
 
-    If PORT is not specified, then it defaults to 80."
+  If PORT is not specified, then it defaults to 80."
     (when (null port) (setq port 80))
     (not (condition-case nil
              (delete-process
