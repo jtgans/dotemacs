@@ -447,6 +447,12 @@ allows you to edit a list interactively.
 
 *** Org mode
 
+Org is amazing. Absolutely amazing. I use it for notes, agendas, etc. It's so
+amazing, I can't even describe how amazing it is. I use it as my default mode
+(instead of fundamental -- a totally useless mode).
+
+Go read [[http://orgmode.org/manual/][the manual]]!
+
 #+BEGIN_SRC emacs-lisp
   (use-package org
     :ensure
@@ -454,8 +460,9 @@ allows you to edit a list interactively.
     :bind (("C-c c" . org-capture)
            ("C-c l" . org-store-link))
     :init
-    (setq org-directory             "~/Notebook/org"
-          org-default-notes-file    "~/Notebook/org/notes.org"
+    (setq-default major-mode 'org-mode)
+    (setq org-directory          "~/Notebook/org"
+          org-default-notes-file "~/Notebook/org/notes.org"
           org-enforce-todo-dependencies t
           org-display-custom-times t
           org-time-stamp-custom-formats '("<%m/%d/%y %a>" . "<%m/%d/%y %a %H:%M>")
