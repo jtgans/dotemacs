@@ -304,7 +304,8 @@ folks.
 
 #+BEGIN_SRC emacs-lisp
   (use-package company
-    :ensure)
+    :ensure
+    :diminish t)
 
   (global-company-mode)
 #+END_SRC
@@ -344,6 +345,29 @@ folks.
           js2-highlight-level 3
           js2-cleanup-whitespace t
           js2-enter-indents-newline t))
+#+END_SRC
+
+*** Semantic
+
+Semantic is great for doing crazy amounts of structured editing in C and C++
+code. In general, I should use this.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package semantic
+    :ensure
+    :config
+    (semantic-mode 1)
+    (global-ede-mode 1))
+#+END_SRC
+
+*** Fill column indicator
+
+This little beauty makes every mode that uses it have a vertical line like
+other, more "modern" editors have.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package fill-column-indicator
+    :ensure)
 #+END_SRC
 
 *** rcirc
@@ -560,8 +584,22 @@ I like to type in Japanese, so let's tell MULE about that.
        (c-set-offset 'access-label '-2)
        (c-set-offset 'innamespace '0)
 
+       (add-hook 'c-mode-common-hook 'fci-mode)
+       (add-hook 'c-mode-common-hook 'linum-mode)
+
        (bind-keys :map c-mode-map
                   ("RET" 'newline-and-indent))))
+#+END_SRC
+
+** Generalized Programming Settings
+
+Stuff that is generally set for all modes, such as arbitrary modes that
+(stupidly) derive from =cc-mode= go here.
+
+#+BEGIN_SRC emacs-lisp
+  (setq c-default-style '((java-mode . "java")
+                          (awk-mode . "awk")
+                          (other . "bsd")))
 #+END_SRC
 
 * Other Customizations
