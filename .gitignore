@@ -1,5 +1,9 @@
 auto-save-list/
-savehist
-emacs-init.el
-recentf
+backups/
+ede-projects.el
 elpa/
+emacs-init.el
+projectile-bookmarks.eld
+rcirc-log/
+recentf
+savehist
