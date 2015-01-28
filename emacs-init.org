@@ -1010,6 +1010,12 @@ Define some useful key bindings specific for elisp editing.
 ** C programming
 
 #+BEGIN_SRC emacs-lisp
+  (use-package google-c-style
+    :ensure
+    :config
+    (add-hook 'c-mode-common-hook 'google-set-c-style)
+    (add-hook 'c-mode-common-hook 'google-make-newline-indent))
+
   (eval-after-load 'cc-mode
     '(progn
        (setq-default c-indent-level 4
