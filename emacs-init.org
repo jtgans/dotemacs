@@ -91,7 +91,7 @@ I /like/ orange, and I like grey. Let's make them play together!
 #+END_SRC
 
 That being said, I do want a decent font sometimes. The default fonts on any
-platform are just yuck.
+platform are just yuck. I prefer [[http://damieng.com/blog/2008/05/26/envy-code-r-preview-7-coding-font-released][Envy Code R preview #7 by DamienG]].
 
 #+BEGIN_SRC emacs-lisp
   (case system-type
