@@ -537,7 +537,9 @@ Go read [[http://orgmode.org/manual/][the manual]]!
           org-src-lang-modes '(("elisp" . emacs-lisp)
                                ("dot"   . fundamental)))
     :config
-    (add-hook 'org-mode-hook #'auto-fill-mode))
+    (add-hook 'org-mode-hook #'auto-fill-mode)
+    (unbind-key "C-c C-j" org-mode-map)
+    (bind-key "C-c C-g" #'org-goto org-mode-map))
 #+END_SRC
 
 **** =org-toc=
