@@ -30,6 +30,23 @@ sources, which would cause a great deal of extra pain when managing this mess.
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 #+END_SRC
 
+* Local elisp packages
+
+Given that I like hacking around in elisp, I'm going to add my own
+little custom elisp and themes dirs to their respective load paths.
+
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/elisp")
+#+END_SRC
+
+* Custom Google[x] theme
+
+I /like/ orange, and I like grey. Let's make them play together!
+
+#+BEGIN_SRC emacs-lisp
+  (load-theme 'googlex t)
+#+END_SRC
+
 * Defuns
 ** My Custom Defuns
 
@@ -174,15 +191,6 @@ instead to check if it's available and install it directly if not.
   (unless (require 'use-package nil t)
     (package-install 'req-package)
     (require 'req-package))
-#+END_SRC
-
-*** Solarized theme
-
-#+BEGIN_SRC emacs-lisp
-  (use-package color-theme-sanityinc-solarized
-    :ensure
-    :config
-    (load-theme 'sanityinc-solarized-dark t))
 #+END_SRC
 
 *** Custom Google[x] theme :TODO:
