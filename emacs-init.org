@@ -411,35 +411,49 @@ allows you to edit a list interactively.
 *** Org mode
 
 #+BEGIN_SRC emacs-lisp
-    (use-package org
-      :ensure
-      :mode ("\\.org$" . org-mode)
-      :bind (("C-c c" . org-capture)
-             ("C-c l" . org-store-link))
-      :init
-      (setq org-directory             "~/Notebook/org"
-            org-default-notes-file    "~/Notebook/org/notes.org"
-            org-enforce-todo-dependencies t
-            org-display-custom-times t
-            org-time-stamp-custom-formats '("<%m/%d/%y %a>" . "<%m/%d/%y %a %H:%M>")
-            org-deadline-warning-days 14
-            org-reverse-note-order t
-            org-return-follows-link t
+  (use-package org
+    :ensure
+    :mode ("\\.org$" . org-mode)
+    :bind (("C-c c" . org-capture)
+           ("C-c l" . org-store-link))
+    :init
+    (setq org-directory             "~/Notebook/org"
+          org-default-notes-file    "~/Notebook/org/notes.org"
+          org-enforce-todo-dependencies t
+          org-display-custom-times t
+          org-time-stamp-custom-formats '("<%m/%d/%y %a>" . "<%m/%d/%y %a %H:%M>")
+          org-deadline-warning-days 14
+          org-reverse-note-order t
+          org-return-follows-link t
 
-            org-special-ctrl-a/e t
-            org-special-ctrl-k t
+          org-structure-template-alist '(("s" "#+BEGIN_SRC ?\n\n#+END_SRC" "<src lang=\"?\">\n\n</src>")
+                                         ("e" "#+BEGIN_EXAMPLE\n?\n#+END_EXAMPLE" "<example>\n?\n</example>")
+                                         ("q" "#+BEGIN_QUOTE\n?\n#+END_QUOTE" "<quote>\n?\n</quote>")
+                                         ("v" "#+BEGIN_VERSE\n?\n#+END_VERSE" "<verse>\n?\n</verse>")
+                                         ("V" "#+BEGIN_VERBATIM\n?\n#+END_VERBATIM" "<verbatim>\n?\n</verbatim>")
+                                         ("c" "#+BEGIN_CENTER\n?\n#+END_CENTER" "<center>\n?\n</center>")
+                                         ("l" "#+BEGIN_SRC emacs-lisp\n?\n#+END_SRC" "<src lang=\"emacs-lisp\">\n?\n</literal>")
+                                         ("h" "#+BEGIN_HTML\n?\n#+END_HTML" "<literal style=\"html\">\n?\n</literal>")
+                                         ("H" "#+HTML: " "<literal style=\"html\">?</literal>")
+                                         ("a" "#+BEGIN_ASCII\n?\n#+END_ASCII" "")
+                                         ("A" "#+ASCII: " "")
+                                         ("i" "#+INDEX: ?" "#+INDEX: ?")
+                                         ("I" "#+INCLUDE: %file ?" "<include file=%file markup=\"?\">"))
 
-            org-refile-use-outline-path 'file
-            org-refile-allow-creating-parent-nodes 'confirm
-            org-refile-targets '((org-agenda-files :maxlevel . 1)
-                                 (nil :maxlevel . 1))
+          org-special-ctrl-a/e t
+          org-special-ctrl-k t
 
-            org-src-fontify-natively t
-            org-src-window-setup 'current-window
-            org-src-lang-modes '(("elisp" . emacs-lisp)
-                                 ("dot"   . fundamental)))
-      :config
-      (add-hook 'org-mode-hook 'auto-fill-mode))
+          org-refile-use-outline-path 'file
+          org-refile-allow-creating-parent-nodes 'confirm
+          org-refile-targets '((org-agenda-files :maxlevel . 1)
+                               (nil :maxlevel . 1))
+
+          org-src-fontify-natively t
+          org-src-window-setup 'current-window
+          org-src-lang-modes '(("elisp" . emacs-lisp)
+                               ("dot"   . fundamental)))
+    :config
+    (add-hook 'org-mode-hook 'auto-fill-mode))
 #+END_SRC
 
 **** =org-toc=
