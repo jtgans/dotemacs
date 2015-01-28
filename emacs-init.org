@@ -465,7 +465,14 @@ in. Unfortunately, the keymaps are a little weird.
     (bind-key "<S-tab>"   'shr-previous-link eww-mode-map))
 #+END_SRC
 
-*** Org mode
+*** On-the-fly spell checking                                      :flyspell:
+
+#+BEGIN_SRC emacs-lisp
+  (use-package flyspell
+    :ensure)
+#+END_SRC
+
+*** Org mode                                                       :org_mode:
 
 Org is amazing. Absolutely amazing. I use it for notes, agendas, etc. It's so
 amazing, I can't even describe how amazing it is. I use it as my default mode
