@@ -31,7 +31,6 @@ sources, which would cause a great deal of extra pain when managing this mess.
 #+END_SRC
 
 * Defuns
-
 ** My Custom Defuns
 
 #+BEGIN_SRC emacs-lisp
@@ -99,7 +98,32 @@ sources, which would cause a great deal of extra pain when managing this mess.
 
 ** Borrowed Defuns
 
+*** rcirc-related helpers
+
+Not sure where I grabbed some of these defuns from.
+
 #+BEGIN_SRC emacs-lisp
+  (require 'netrc)
+
+  (defvar dim:dynamic-fill-column-margin 3
+    "Safety margin used to calculate fill-column depending on window-width")
+
+  (defun dim:dynamic-fill-column-window (window &optional margin)
+    "Dynamically get window's width and adjust fill-column accordingly"
+    (with-current-buffer (window-buffer window)
+      (when (eq major-mode 'rcirc-mode)
+        (setq fill-column
+              (- (window-width window) 
+                 (or margin dim:dynamic-fill-column-margin))))))
+
+  (defun dim:dynamic-fill-column (frame)
+    "Dynamically tune fill-column for a frame's windows at redisplay time"
+    (walk-windows 'dim:dynamic-fill-column-window 'no-minibuf frame))
+
+  (defun rcirc-get-nick-pass (server nick)
+    "Return the password for the given nick to send to nickserv."
+    (let ((tokens (netrc-machine (netrc-parse) server)))
+      (netrc-get tokens "password")))
 #+END_SRC
 
 * Add-on Packages
@@ -140,7 +164,7 @@ Quick reference to =use-package=:
   - =:mode= :: ??? FIXME
   - =:load-path= :: ??? FIXME
 
-*** =use-package.el=
+*** =use-package=
 
 This is a little unique since there's a bootstrapping problem here. Instead of
 using =use-package= to install =use-package=, I do a quick hack around it
@@ -162,7 +186,6 @@ instead to check if it's available and install it directly if not.
 #+END_SRC
 
 *** Custom Google[x] theme :TODO:
-
 *** magit
 
 #+BEGIN_SRC emacs-lisp
@@ -318,7 +341,26 @@ folks.
 *** rcirc
 
 #+BEGIN_SRC emacs-lisp
+  (use-package rcirc-color
+    :ensure)
 
+  (use-package rcirc
+    :ensure
+    :config
+    (require 'rcirc-color)
+
+    (setq rcirc-log-flag t
+          rcirc-omit-responses '("JOIN" "PART" "QUIT" "NICK" "AWAY")
+          rcirc-decode-coding-system 'undecided
+          rcirc-auto-authenticate t
+          rcirc-default-nick "texel"
+          rcirc-default-user-name "texel"
+          rcirc-default-user-full-name "June Tate-Gans")
+          rcirc-authinfo `("freenode" nickserv "texel" ,(rcirc-get-nick-pass "irc.freenode.net" "texel"))
+
+    (set-face-foreground 'rcirc-my-nick "yellow" nil)
+    (add-to-list 'window-size-change-functions 'dim:dynamic-fill-column)
+    (add-hook 'rcirc-mode-hook 'flyspell-mode))
 #+END_SRC
 
 * Non-package Key Bindings
