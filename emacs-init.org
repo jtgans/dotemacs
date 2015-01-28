@@ -100,9 +100,10 @@ junk as I can from the get-go.
 #+BEGIN_SRC emacs-lisp
   (require 'cl)
 
-  (setq default-frame-alist '((menu-bar-lines . 0)
+  (setq initial-frame-alist '((menu-bar-lines . 0)
                               (tool-bar-lines . 0)
-                              (vertical-scroll-bars)))
+                              (vertical-scroll-bars))
+        default-frame-alist initial-frame-alist)
 #+END_SRC
 
 * Customize custom file
