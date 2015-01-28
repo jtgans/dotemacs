@@ -63,26 +63,27 @@ junk as I can from the get-go.
         default-frame-alist initial-frame-alist)
 #+END_SRC
 
-* Customize custom file
+* Customize custom file                                           :customize:
 
-Force custom settings to custom.el instead of init.el. I do this so that source
-control can just manage init.el and init.org. Customize tends to mangle elisp
-sources, which would cause a great deal of extra pain when managing this mess.
+Force custom settings to =custom.el= instead of =init.el=. I do this so that
+source control can just manage =init.el= and =emacs-init.org= without generating
+spurious diffs over time. Customize tends to mangle elisp sources, which would
+cause a great deal of extra pain when managing this mess.
 
 #+BEGIN_SRC emacs-lisp
   (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 #+END_SRC
 
-* Local elisp packages
+* Local elisp packages                                                :elisp:
 
-Given that I like hacking around in elisp, I'm going to add my own
-little custom elisp and themes dirs to their respective load paths.
+Given that I like hacking around in elisp, I'm going to add my own little custom
+elisp dir to the load path.
 
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'load-path "~/.emacs.d/elisp")
 #+END_SRC
 
-* Custom Google<x> theme
+* Custom Google<x> theme                                             :themes:
 
 I /like/ orange, and I like grey. Let's make them play together!
 
@@ -100,12 +101,15 @@ platform are just yuck. I prefer [[http://damieng.com/blog/2008/05/26/envy-code-
              (set-face-attribute 'default nil :inherit nil)))
 #+END_SRC
 
-* Platform-specific fixes
+* Platform-specific fixes                                            :tweaks:
 
-Occasionally things get weird on other platforms, so I try to deal with that
-here if I can.
+Occasionally things get weird on the various platforms I use (MacOS X, Linux,
+BSD, etc.), so I try to deal with that here if I can.
 
 ** MacOS X
+
+Likely because of Apple's Bonjour, system names tend to get a little goofed up
+on MacOS X. This should help by stripping off the domain part.
 
 #+BEGIN_SRC emacs-lisp
   ;; Fix broken system-name on OS X
@@ -114,8 +118,10 @@ here if I can.
       (setq system-name (car (split-string system-name "\\."))))
 #+END_SRC
 
-* Defuns
+* Defuns                                                              :elisp:
 ** My Custom Defuns
+
+Various bits of elisp to help make existing in emacs a bit smoother.
 
 #+BEGIN_SRC emacs-lisp
   (defun jtg:jump-to-or-start-term (ch)
@@ -185,6 +191,13 @@ here if I can.
 
 ** Unity Defuns
 
+Because I like to make games in Unity, and I like emacs' =compile= command
+(along with =flycheck= and so-on) I've written a couple of functions to compile
+unity games. These were borrowed and then mogrified from [[https://bbbscarter.wordpress.com/2014/04/21/compiling-unity-projects-from-within-emacs/][Simon Carter's setup]].
+
+I'll likely see about eliminating the python script at some point to simplify
+some of the setup.
+
 #+BEGIN_SRC emacs-lisp
   (defun jtg:unity-compile-game ()
     "Compiles a Unity 3D game (fast)."
@@ -200,7 +213,10 @@ here if I can.
 #+END_SRC
 
 ** Borrowed Defuns
-*** From http://emacswiki.org/emacs/Yasnippet
+*** Yasnippet prompt using helm
+
+From http://emacswiki.org/emacs/Yasnippet. Lets me use helm as the completion
+bit for yasnippet.
 
 #+BEGIN_SRC emacs-lisp
   (defun shk-yas/helm-prompt (prompt choices &optional display-fn)
@@ -224,7 +240,9 @@ here if I can.
       nil))
 #+END_SRC
 
-*** From [[http://www.emacswiki.org/emacs/HexColour]]
+*** Inline hexcolor string colorization                              :tweaks:
+
+From [[http://www.emacswiki.org/emacs/HexColour]]. 
 
 Handy bit of code to colorize HTML-style RGB strings with their actual values.
 I've adjusted it to use American english names.
@@ -241,7 +259,7 @@ I've adjusted it to use American english names.
     (font-lock-add-keywords nil hexcolor-keywords))
 #+END_SRC
 
-*** Back to indentation or actual beginning-of-line
+*** Back to indentation or actual beginning-of-line                  :tweaks:
 
 Borrowed from [[https://github.com/Wilfred/.emacs.d/blob/gh-pages/init.org#by-symbol][Wilfred's init.org]].
 
@@ -303,11 +321,11 @@ enough.
 
 * Add-on Packages
 
-I use John Wiegley's =[[https://github.com/jwiegley/use-package][use-package]]= to help config/install packages that may or
+I use John Wiegley's [[https://github.com/jwiegley/use-package][=use-package=]] to help config/install packages that may or
 may not be present on the current system. This makes use of [[http://melpa.milkbox.net/][MELPA]]'s package
 repository to slurp packages down via =package.el=.
 
-** package.el setup
+** package.el setup                                              :package_el:
 
 I prefer MELPA as my first source of truth, followed by org and then GNU. We
 only update the list of packages if and only if we're online and can reach
@@ -326,7 +344,7 @@ MELPA.
   (package-initialize)
 #+END_SRC
 
-** Packages and their configs
+** Packages and their configs                                    :package_el:
 
 Quick reference to =use-package=:
   - =:ensure= :: forces a package to be installed if it hasn't been already.
@@ -339,7 +357,7 @@ Quick reference to =use-package=:
   - =:mode= :: ??? FIXME
   - =:load-path= :: ??? FIXME
 
-*** =use-package=
+*** use-package setup                                           :use_package:
 
 This is a little unique since there's a bootstrapping problem here. Instead of
 using =use-package= to install =use-package=, I do a quick hack around it
@@ -351,7 +369,7 @@ instead to check if it's available and install it directly if not.
     (require 'use-package))
 #+END_SRC
 
-*** magit
+*** Simple git client                                                 :magit:
 
 #+BEGIN_SRC emacs-lisp
   (use-package magit
@@ -385,14 +403,14 @@ instead to check if it's available and install it directly if not.
     :ensure)
 #+END_SRC
 
-*** ggtags
+*** GNU Global Tags                                                  :ggtags:
 
 #+BEGIN_SRC emacs-lisp
   (use-package ggtags
     :ensure)
 #+END_SRC
 
-*** =expand-region=
+*** Progressive region expansion                              :expand_region:
 
 Really useful method for making a quick region selection. Instead of moving
 point, you just repeatedly press a key to expand the region from point to ever
@@ -404,7 +422,7 @@ larger chunks.
     :bind (("M-C-SPC" . er/expand-region)))
 #+END_SRC
 
-*** =edit-list=
+*** Edit an existing elisp form interactively                     :edit_list:
 
 Something I tried to hack up using =gnus-eforms= but ultimately failed. This
 allows you to edit a list interactively.
@@ -414,7 +432,7 @@ allows you to edit a list interactively.
     :ensure)
 #+END_SRC
 
-*** Emacs web wowser (=eww=)
+*** Emacs web wowser                                                    :eww:
 
 This thing is crazy. Emacs finally has a web browser built
 in. Unfortunately, the keymaps are a little weird.
@@ -517,7 +535,7 @@ folks.
                                   ("1" "1:1 Note" entry (file+datetree current-one-on-one "* [%<%d-%b-%Y %H:%M>] %?\n%i\n")))))
 #+END_SRC
 
-**** =org-agenda=
+**** org-agenda
 
 #+BEGIN_SRC emacs-lisp
   (use-package org-agenda
@@ -545,7 +563,7 @@ folks.
                                          (org-agenda-overriding-header "Unscheduled TODO entries: "))))))
 #+END_SRC
 
-**** =org-mobile=
+**** org-mobile
 
 #+BEGIN_SRC emacs-lisp
   (use-package org-mobile
@@ -554,7 +572,7 @@ folks.
           org-mobile-directory      "~/Dropbox/MobileOrg"))
 #+END_SRC
 
-*** =company-mode=
+*** Complete anything                                          :company_mode:
 
 #+BEGIN_SRC emacs-lisp
   (use-package company
@@ -564,7 +582,7 @@ folks.
   (global-company-mode)
 #+END_SRC
 
-*** =footnote-mode=
+*** Add footnotes to messages                                 :footnote_mode:
 
 #+BEGIN_SRC emacs-lisp
   (use-package footnote
@@ -576,7 +594,7 @@ folks.
           footnote-spaced-footnotes nil))
 #+END_SRC
 
-*** Powerline
+*** Mode-line replacement and cleanup                             :powerline:
 
 #+BEGIN_SRC emacs-lisp
 (use-package powerline
@@ -587,7 +605,7 @@ folks.
   (powerline-center-theme))
 #+END_SRC
 
-*** Flycheck
+*** Check programs for errors on the fly                           :flycheck:
 
 Really useful, lighter weight replacement to flymake.
 
@@ -608,7 +626,7 @@ Really useful, lighter weight replacement to flymake.
     (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
 #+END_SRC
 
-*** =markdown-mode=
+*** Markdown editing mode                                          :markdown:
 
 #+BEGIN_SRC emacs-lisp
   (use-package markdown-mode
@@ -619,8 +637,8 @@ Really useful, lighter weight replacement to flymake.
     :config
     (add-to-list 'markdown-mode-hook 'auto-fill-mode))
 #+END_SRC
-
-*** =js2-mode=
+arkdo
+*** JavaScript editing mode                                        :js2_mode:
 
 #+BEGIN_SRC emacs-lisp
   (use-package js2-mode
@@ -637,7 +655,7 @@ Really useful, lighter weight replacement to flymake.
     (add-hook 'js2-mode-hook #'auto-fill-mode))
 #+END_SRC
 
-*** C# mode
+*** C# editing mode                                             :csharp_mode:
 
 This is yet another handy mode for editing C# files. Quite useful, though I
 don't do much in the way of customization. Probably should, though.
@@ -656,7 +674,7 @@ don't do much in the way of customization. Probably should, though.
     (add-hook 'csharp-mode-hook #'company-mode))
 #+END_SRC
 
-*** Swift mode
+*** Swift editing mode                                                :swift:
 
 #+BEGIN_SRC emacs-lisp
   (use-package swift-mode
@@ -666,14 +684,14 @@ don't do much in the way of customization. Probably should, though.
     (add-to-list 'flycheck-checkers 'swift))
 #+END_SRC
 
-*** YAML mode
+*** YAML mode                                                          :yaml:
 
 #+BEGIN_SRC emacs-lisp
   (use-package yaml-mode
     :ensure)
 #+END_SRC
 
-*** Semantic
+*** Semantic and structured code editing                           :semantic:
 
 Semantic is great for doing crazy amounts of structured editing in C and C++
 code. In general, I should use this.
@@ -686,7 +704,7 @@ code. In general, I should use this.
     (global-ede-mode 1))
 #+END_SRC
 
-*** Fill column indicator
+*** Fill column indicator                                               :fci:
 
 This little beauty makes every mode that uses it have a vertical line like
 other, more "modern" editors have.
@@ -698,7 +716,7 @@ other, more "modern" editors have.
     (setq-default fci-rule-column 80))
 #+END_SRC
 
-*** Projectile
+*** Code project management                                      :projectile:
 
 Really handy, lightweight project system to identify a "project" based upon a
 simple file at the root of it. Searches upstream through the tree for the file,
@@ -713,7 +731,7 @@ just like how git does.
     (projectile-global-mode))
 #+END_SRC
 
-*** Yasnippet
+*** Code snippet template insertions                              :yasnippet:
 
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
@@ -728,7 +746,7 @@ just like how git does.
     (diminish 'yas-minor-mode))
 #+END_SRC
 
-*** Helm
+*** Quick emacs navigation                                             :helm:
 
 Huge interaction usability increase with this little package. Works like
 QuickSilver on the Mac to make things very simple.
@@ -758,7 +776,7 @@ QuickSilver on the Mac to make things very simple.
     (helm-mode 1))
 #+END_SRC
 
-**** =helm-projectile=
+**** helm-projectile
 
 #+BEGIN_SRC emacs-lisp
   (use-package helm-projectile
@@ -768,7 +786,7 @@ QuickSilver on the Mac to make things very simple.
                  (helm-projectile-on)))
 #+END_SRC
 
-**** =helm-company=
+**** helm-company
 
 #+BEGIN_SRC emacs-lisp
   (use-package helm-company
@@ -778,28 +796,28 @@ QuickSilver on the Mac to make things very simple.
             (define-key company-active-map (kbd "C-:") 'helm-company)))
 #+END_SRC
 
-**** =helm-dash=
+**** helm-dash
 
 #+BEGIN_SRC emacs-lisp
   (use-package helm-dash
     :ensure)
 #+END_SRC
 
-**** =helm-flycheck=
+**** helm-flycheck
 
 #+BEGIN_SRC emacs-lisp
   (use-package helm-flycheck
     :ensure)
 #+END_SRC
 
-**** =helm-c-yasnippet=
+**** helm-c-yasnippet
 
 #+BEGIN_SRC emacs-lisp
   (use-package helm-c-yasnippet
     :ensure)
 #+END_SRC
 
-*** rcirc
+*** Simple emacs IRC client                                           :rcirc:
 
 #+BEGIN_SRC emacs-lisp
   (use-package rcirc-color
@@ -828,7 +846,7 @@ QuickSilver on the Mac to make things very simple.
     (rcirc-track-minor-mode))
 #+END_SRC
 
-* Non-package Key Bindings
+* Non-package Key Bindings                                         :keybinds:
 
 This is where I setup my generalized key bindings that don't directly affect a
 given mode. I much prefer using John Wiegley's =bind-key= package to manage
@@ -908,7 +926,7 @@ emacs -- especially when it's daemonized.
   (bind-key "C-c t" #'jtg:jump-to-or-start-term)
 #+END_SRC
 
-* General Emacs Tweaks
+* General Emacs Tweaks                                               :tweaks:
 
 Things that don't relate to packages or are generalized emacs settings go here.
 
@@ -945,7 +963,7 @@ Tabs are evil, but we still have to live with them.
                 indicate-buffer-boundaries t)
 #+END_SRC
 
-** Enable =narrow-to-region=
+** Enable narrow-to-region
 
 Really, really handy, though confusing to folks who accidentally type in
 =C-x n n=. Emacs will auto-set this in [[~/.emacs.d/custom.el][custom.el]] on first use, but I didn't feel
@@ -961,7 +979,7 @@ like that was necessary. Just adds extra problems to source control.
 (global-auto-revert-mode t)
 #+END_SRC
 
-** Re-use current =dired= buffer
+** Re-use current dired buffer
 
 =dired= has this really nifty feature where if you open the dir at point with
 =RET= it will re-use the existing buffer instead of spewing buffers all over the
@@ -1033,8 +1051,8 @@ I like to type in Japanese, so let's tell MULE about that.
   (prefer-coding-system 'utf-8)
 #+END_SRC
 
-* Programming Customizations
-** Emacs Lisp
+* Programming Customizations                                    :programming:
+** Emacs Lisp                                                         :elisp:
 
 Various tweaks to make editing elisp easier.
 
@@ -1080,7 +1098,7 @@ editing themes more often now.
   (add-hook 'emacs-lisp-mode-hook #'hexcolor-add-to-font-lock)
 #+END_SRC
 
-** C/C++ programming
+** C/C++ programming                                                 :c_mode:
 
 *** C style
    
@@ -1115,7 +1133,7 @@ I prefer the Google C style when possible.
        (add-hook 'c-mode-common-hook #'auto-fill-mode)))
 #+END_SRC
 
-** Generalized Programming Settings
+** Generalized Programming Settings                                :progmode:
 
 Stuff that is generally set for all modes, such as arbitrary modes that
 (stupidly) derive from =cc-mode= go here.
@@ -1126,7 +1144,7 @@ Stuff that is generally set for all modes, such as arbitrary modes that
                           (other . "bsd")))
 #+END_SRC
 
-* Text Customizations
+* Text Customizations                                             :text_mode:
 ** Single-space sentences
 
 Seriously, does /anyone/ type with two spaces at the end of a period in a fixed
