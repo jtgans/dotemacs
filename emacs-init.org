@@ -950,7 +950,7 @@ had my own custom prefix key, anyway.
 #+BEGIN_SRC emacs-lisp
   (bind-keys :prefix-map jtg:jump-map
              :prefix-docstring "Personal keymap used for custom key definitions."
-             :prefix "C-x j"
+             :prefix "C-c C-j"
              ("e" . eww)
              ("I" . find-init-file)
              ("R" . reload-init-file))
