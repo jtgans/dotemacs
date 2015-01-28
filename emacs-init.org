@@ -56,7 +56,7 @@ Seth!
 Just stick this in the [[~/.emacs.d/init.el][init.el]]:
 
 #+BEGIN_EXAMPLE
-;; Emacs initialization is handled in the init.org file.
+;; Emacs initialization is handled in the emacs-init.org file.
 (org-babel-load-file (expand-file-name "emacs-init.org" user-emacs-directory))
 #+END_EXAMPLE
 
