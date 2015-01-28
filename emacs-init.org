@@ -9,6 +9,45 @@
 # don't use TeX syntax for sub and superscripts
 # See http://orgmode.org/manual/Export-options.html
 
+* Table of Contents                                                     :TOC:
+ - [[#emacs-config-in-org-mode][Emacs config in =org-mode=]]
+ - [[#super-early-customization][Super early customization]]
+ - [[#customize-custom-file][Customize custom file]]
+ - [[#local-elisp-packages][Local elisp packages]]
+ - [[#custom-googlex-theme][Custom Google<x> theme]]
+ - [[#platform-specific-fixes][Platform-specific fixes]]
+     - [[#macos-x][MacOS X]]
+ - [[#defuns][Defuns]]
+     - [[#my-custom-defuns][My Custom Defuns]]
+     - [[#unity-defuns][Unity Defuns]]
+     - [[#borrowed-defuns][Borrowed Defuns]]
+ - [[#add-on-packages][Add-on Packages]]
+     - [[#packageel-setup][package.el setup]]
+     - [[#packages-and-their-configs][Packages and their configs]]
+ - [[#non-package-key-bindings][Non-package Key Bindings]]
+ - [[#general-emacs-tweaks][General Emacs Tweaks]]
+     - [[#stop-emacs-from-gcing-the-world][Stop Emacs from GCing the world]]
+     - [[#tabs][Tabs]]
+     - [[#fringe-settings][Fringe settings]]
+     - [[#enable-narrow-to-region][Enable =narrow-to-region=]]
+     - [[#revert-a-buffer-when-the-underlying-file-changes][Revert a buffer when the underlying file changes]]
+     - [[#re-use-current-dired-buffer][Re-use current =dired= buffer]]
+     - [[#backup-files-to-backup-dir][Backup files to backup dir]]
+     - [[#make-urls-in-man-clickable][Make URLs in Man clickable]]
+     - [[#input-methods][Input methods]]
+     - [[#misc-settings][Misc settings]]
+ - [[#programming-customizations][Programming Customizations]]
+     - [[#emacs-lisp][Emacs Lisp]]
+     - [[#c-programming][C programming]]
+     - [[#generalized-programming-settings][Generalized Programming Settings]]
+ - [[#text-customizations][Text Customizations]]
+     - [[#single-space-sentences][Single-space sentences]]
+ - [[#other-customizations][Other Customizations]]
+     - [[#ansi-term-terminal-tweaks][=ansi-term= terminal tweaks]]
+     - [[#uniqueify-buffer-names][Uniqueify buffer names]]
+     - [[#remember-bits-of-history][Remember bits of history]]
+     - [[#remember-recent-files][Remember recent files]]
+
 * Emacs config in =org-mode=
 
 Shamelessly templated after [[mailto:seth@userprimary.net][Seth Falcon]]'s [[http://raw.githubusercontent.com/seth/my-emacs-dot-d/master/emacs-init.org][emacs-init.org]] on GitHub. Great idea,
@@ -21,6 +60,19 @@ Just stick this in the [[~/.emacs.d/init.el][init.el]]:
 (org-babel-load-file (expand-file-name "emacs-init.org" user-emacs-directory))
 #+END_EXAMPLE
 
+* Super early customization
+
+Defaults in emacs tend to annoy me rather than help me. So I turn off as much
+junk as I can from the get-go.
+
+#+BEGIN_SRC emacs-lisp
+  (require 'cl)
+
+  (setq default-frame-alist '((menu-bar-lines . 0)
+                              (tool-bar-lines . 0)
+                              (vertical-scroll-bars)))
+#+END_SRC
+
 * Customize custom file
 
 Force custom settings to custom.el instead of init.el. I do this so that source
@@ -28,7 +80,7 @@ control can just manage init.el and init.org. Customize tends to mangle elisp
 sources, which would cause a great deal of extra pain when managing this mess.
 
 #+BEGIN_SRC emacs-lisp
-(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 #+END_SRC
 
 * Local elisp packages
@@ -40,12 +92,36 @@ little custom elisp and themes dirs to their respective load paths.
   (add-to-list 'load-path "~/.emacs.d/elisp")
 #+END_SRC
 
-* Custom Google[x] theme
+* Custom Google<x> theme
 
 I /like/ orange, and I like grey. Let's make them play together!
 
 #+BEGIN_SRC emacs-lisp
   (load-theme 'googlex t)
+#+END_SRC
+
+That being said, I do want a decent font sometimes. The default fonts on any
+platform are just yuck.
+
+#+BEGIN_SRC emacs-lisp
+  (case system-type
+    ('darwin (set-face-font 'default "Envy Code R")
+             (set-face-attribute 'default nil :height 141)
+             (set-face-attribute 'default nil :inherit nil)))
+#+END_SRC
+
+* Platform-specific fixes
+
+Occasionally things get weird on other platforms, so I try to deal with that
+here if I can.
+
+** MacOS X
+
+#+BEGIN_SRC emacs-lisp
+  ;; Fix broken system-name on OS X
+  (if (or (eq system-type 'darwin)
+          (eq system-type 'berkeley-unix))
+      (setq system-name (car (split-string system-name "\\."))))
 #+END_SRC
 
 * Defuns
@@ -102,19 +178,76 @@ I /like/ orange, and I like grey. Let's make them play together!
     (insert-time))
 #+END_SRC
 
-** Hook Defuns
+** Unity Defuns
 
 #+BEGIN_SRC emacs-lisp
-  (defun jtg:lambda-to-λ ()
-    "Adds font-lock keywords to convert the word lambda into the actual character."
-    (font-lock-add-keywords
-     nil `(("(\\(lambda\\>\\)"
-            (0 (progn (compose-region (match-beginning 1) (match-end 1)
-                                      ,(make-char 'greek-iso8859-7 107))
-                      nil))))))
+  (defun jtg:unity-compile-game ()
+    "Compiles a Unity 3D game (fast)."
+    (interactive)
+    (let ((cmd (concat "python " (projectile-project-root) "make.py fast " (projectile-project-root))))
+      (compile cmd)))
+
+  (defun jtg:unity-recompile-game ()
+    "Compiles a Unity 3D game (slow)."
+    (interactive)
+    (let ((cmd (concat “python ” (projectile-project-root) “make.py slow ” (projectile-project-root))))
+      (compile cmd)))
 #+END_SRC
 
 ** Borrowed Defuns
+*** From http://emacswiki.org/emacs/Yasnippet
+
+#+BEGIN_SRC emacs-lisp
+  (defun shk-yas/helm-prompt (prompt choices &optional display-fn)
+    "Use helm to select a snippet. Put this into `yas/prompt-functions.'"
+    (interactive)
+    (setq display-fn (or display-fn 'identity))
+    (if (require 'helm-config)
+        (let (tmpsource cands result rmap)
+          (setq cands (mapcar (lambda (x) (funcall display-fn x)) choices))
+          (setq rmap (mapcar (lambda (x) (cons (funcall display-fn x) x)) choices))
+          (setq tmpsource
+                (list
+                 (cons 'name prompt)
+                 (cons 'candidates cands)
+                 '(action . (("Expand" . (lambda (selection) selection))))
+                 ))
+          (setq result (helm-other-buffer '(tmpsource) "*helm-select-yasnippet"))
+          (if (null result)
+              (signal 'quit "user quit!")
+            (cdr (assoc result rmap))))
+      nil))
+#+END_SRC
+
+*** Back to indentation or actual beginning-of-line
+
+Borrowed from [[https://github.com/Wilfred/.emacs.d/blob/gh-pages/init.org#by-symbol][Wilfred's init.org]].
+
+#+BEGIN_SRC emacs-lisp
+(defun beginning-of-line-dwim ()
+  "Toggles between moving point to the first non-whitespace character, and
+the start of the line."
+  (interactive)
+  (let ((start-position (point)))
+    ;; Move to the first non-whitespace character.
+    (back-to-indentation)
+    
+    ;; If we haven't moved position, go to start of the line.
+    (when (= (point) start-position)
+      (move-beginning-of-line nil))))
+#+END_SRC 
+
+*** Eliminate magit higlighting
+
+Magit has this really annoying habit of highlighting the current chunk in a
+really garish color background. Worse, it uses overlays to ensure colors show up
+right over the background. I don't care for either of those bits of
+functionality, so I prefer to turn it off using [[https://github.com/magit/magit/issues/133][DarwinAwardWinner's fix]].
+
+#+BEGIN_SRC emacs-lisp
+(defun disable-magit-highlight-in-buffer () 
+  (face-remap-add-relative 'magit-item-highlight '()))
+#+END_SRC 
 
 *** rcirc-related helpers
 
@@ -190,17 +323,48 @@ instead to check if it's available and install it directly if not.
 
 #+BEGIN_SRC emacs-lisp
   (unless (require 'use-package nil t)
-    (package-install 'req-package)
-    (require 'req-package))
+    (package-install 'use-package)
+    (require 'use-package))
 #+END_SRC
 
-*** Custom Google[x] theme :TODO:
 *** magit
 
 #+BEGIN_SRC emacs-lisp
-  (use-package magit
-    :ensure
-    :bind ("C-x g" . magit-status))
+    (use-package magit
+      :ensure
+      :bind ("C-x g" . magit-status)
+      :init
+      (require 'magit)
+      (magit-auto-revert-mode t)
+      :config
+      (diminish 'magit-auto-revert-mode)
+
+      (setq magit-diff-use-overlays nil)
+      
+      (add-hook 'magit-status-mode-hook 'disable-magit-highlight-in-buffer)
+      (add-hook 'magit-diff-mode-hook 'disable-magit-highlight-in-buffer)
+      (add-hook 'magit-log-edit-mode-hook 'auto-fill-mode))
+#+END_SRC
+
+**** magit-annex
+
+#+BEGIN_SRC emacs-lisp
+  (use-package magit-annex
+    :ensure)
+#+END_SRC
+
+**** magit-filenotify
+
+#+BEGIN_SRC emacs-lisp
+  (use-package magit-filenotify
+    :ensure)
+#+END_SRC
+
+**** magit-push-remote
+
+#+BEGIN_SRC emacs-lisp
+  (use-package magit-push-remote
+    :ensure)
 #+END_SRC
 
 *** ggtags
@@ -210,35 +374,84 @@ instead to check if it's available and install it directly if not.
     :ensure)
 #+END_SRC
 
+*** =expand-region=
+
+Really useful method for making a quick region selection. Instead of moving
+point, you just repeatedly press a key to expand the region from point to ever
+larger chunks.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package expand-region
+    :ensure
+    :bind (("M-C-SPC" . er/expand-region)))
+#+END_SRC
+
+*** =pretty-mode=
+
+Converts silly things like the word =lambda= into the actual symbol. Much better
+than the usual one-offs I've written to do this job.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package pretty-mode
+    :ensure
+    :init
+    (global-pretty-mode t))
+#+END_SRC
+
+*** =edit-list=
+
+Something I tried to hack up using =gnus-eforms= but ultimately failed. This
+allows you to edit a list interactively.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package edit-list
+    :ensure)
+#+END_SRC
+
 *** Org mode
 
 #+BEGIN_SRC emacs-lisp
-  (use-package org
+    (use-package org
+      :ensure
+      :mode ("\\.org$" . org-mode)
+      :bind (("C-c c" . org-capture)
+             ("C-c l" . org-store-link))
+      :init
+      (setq org-directory             "~/Notebook/org"
+            org-default-notes-file    "~/Notebook/org/notes.org"
+            org-enforce-todo-dependencies t
+            org-display-custom-times t
+            org-time-stamp-custom-formats '("<%m/%d/%y %a>" . "<%m/%d/%y %a %H:%M>")
+            org-deadline-warning-days 14
+            org-reverse-note-order t
+            org-return-follows-link t
+
+            org-special-ctrl-a/e t
+            org-special-ctrl-k t
+
+            org-refile-use-outline-path 'file
+            org-refile-allow-creating-parent-nodes 'confirm
+            org-refile-targets '((org-agenda-files :maxlevel . 1)
+                                 (nil :maxlevel . 1))
+
+            org-src-fontify-natively t
+            org-src-window-setup 'current-window
+            org-src-lang-modes '(("elisp" . emacs-lisp)
+                                 ("dot"   . fundamental)))
+      :config
+      (add-hook 'org-mode-hook 'auto-fill-mode))
+#+END_SRC
+
+**** =org-toc=
+
+Creates a simple table of contents on the first headline with a =:TOC:= tag
+embedded on it.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org-toc
     :ensure
-    :mode ("\\.org$" . org-mode)
-    :bind (("C-c c" . org-capture)
-           ("C-c l" . org-store-link))
     :init
-    (setq org-directory             "~/Notebook/org"
-          org-default-notes-file    "~/Notebook/org/notes.org"
-          org-enforce-todo-dependencies t
-          org-display-custom-times t
-          org-time-stamp-custom-formats '("<%m/%d/%y %a>" . "<%m/%d/%y %a %H:%M>")
-          org-deadline-warning-days 14
-          org-reverse-note-order t
-          org-return-follows-link t
-
-          org-special-ctrl-a/e t
-          org-special-ctrl-k t
-
-          org-refile-use-outline-path 'file
-          org-refile-allow-creating-parent-nodes 'confirm
-          org-refile-targets '((org-agenda-files :maxlevel . 1)
-                               (nil :maxlevel . 1))
-
-          org-src-fontify-natively t
-          org-src-lang-modes '(("elisp" . emacs-lisp)
-                               ("dot"   . fundamental))))
+    (add-hook 'org-mode-hook 'org-toc-enable))
 #+END_SRC
 
 **** =org-capture=
@@ -277,6 +490,7 @@ folks.
           org-agenda-skip-scheduled-if-done t
           org-agenda-start-on-weekday nil
           org-agenda-span 'week
+          org-agenda-dim-blocked-tasks t
           org-agenda-custom-commands '(("d" "Delegated tasks" todo "DELEGATED" nil)
                                        ("c" "Completed tasks" todo "DONE|DEFERRED|CANCELLED" nil)
                                        ("w" "Blocked tasks" todo "WAITING" nil)
@@ -306,7 +520,7 @@ folks.
 #+BEGIN_SRC emacs-lisp
   (use-package company
     :ensure
-    :diminish t)
+    :diminish company-mode)
 
   (global-company-mode)
 #+END_SRC
@@ -322,6 +536,38 @@ folks.
           footnote-spaced-footnotes nil))
 #+END_SRC
 
+*** Powerline
+
+#+BEGIN_SRC emacs-lisp
+(use-package powerline
+  :ensure
+  :init (powerline-center-theme)
+  :config
+  (setq powerline-default-separator 'butt)
+  (powerline-center-theme))
+#+END_SRC
+
+*** Flycheck
+
+Really useful, lighter weight replacement to flymake.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck
+    :ensure
+    :diminish flycheck-mode
+    :init (require 'flycheck)
+    :bind (("M-n" . flycheck-next-error)
+           ("M-p" . flycheck-previous-error))
+    :config
+    (setq flycheck-checkers (--remove (eq it 'emacs-lisp-checkdoc) flycheck-checkers))
+    (global-flycheck-mode))
+
+  (use-package flycheck-pos-tip
+    :ensure
+    :init
+    (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
+#+END_SRC
+
 *** =markdown-mode=
 
 #+BEGIN_SRC emacs-lisp
@@ -329,7 +575,9 @@ folks.
     :ensure
     :mode (("\\.text\\'" . markdown-mode)
            ("\\.markdown\\'" . markdown-mode)
-           ("\\.md\\'" . markdown-mode)))
+           ("\\.md\\'" . markdown-mode))
+    :config
+    (add-to-list 'markdown-mode-hook 'auto-fill-mode))
 #+END_SRC
 
 *** =js2-mode=
@@ -356,8 +604,32 @@ don't do much in the way of customization. Probably should, though.
 #+BEGIN_SRC emacs-lisp
   (use-package csharp-mode
     :ensure
-    :config (progn (add-hook 'csharp-mode-hook 'fci-mode)
-                   (add-hook 'csharp-mode-hook 'company-mode)))
+    :config
+    (flycheck-define-checker csharp-unity
+                             "Custom checker for Unity projects"
+                             :modes (csharp-mode)
+                             :command ("python" (eval (concat (projectile-project-root) "make.py")) "fast" (eval (projectile-project-root)) source-original source)
+                             :error-patterns ((warning line-start (file-name) "(" line (zero-or-more not-newline) "): " (message) line-end)
+                                              (error line-start (file-name) "(" line (zero-or-more not-newline) "): " (message) line-end)))
+    (add-hook 'csharp-mode-hook 'fci-mode)
+    (add-hook 'csharp-mode-hook 'company-mode))
+#+END_SRC
+
+*** Swift mode
+
+#+BEGIN_SRC emacs-lisp
+  (use-package swift-mode
+    :ensure
+    :config
+    (setq flycheck-swift-sdk-path "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin")
+    (add-to-list 'flycheck-checkers 'swift))
+#+END_SRC
+
+*** YAML mode
+
+#+BEGIN_SRC emacs-lisp
+  (use-package yaml-mode
+    :ensure)
 #+END_SRC
 
 *** Semantic
@@ -380,6 +652,108 @@ other, more "modern" editors have.
 
 #+BEGIN_SRC emacs-lisp
   (use-package fill-column-indicator
+    :ensure
+    :config
+    (setq-default fci-rule-column 80))
+#+END_SRC
+
+*** Projectile
+
+Really handy, lightweight project system to identify a "project" based upon a
+simple file at the root of it. Searches upstream through the tree for the file,
+just like how git does.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package projectile
+    :ensure
+    :diminish projectile-mode
+    :init
+    (require 'projectile)
+    (projectile-global-mode))
+#+END_SRC
+
+*** Yasnippet
+
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet
+    :ensure
+    :diminish yasnippet-mode
+    :commands yas-global-mode
+    :init
+    (add-hook 'hippie-expand-try-functions-list 'yas-hippie-try-expand)
+    (yas-global-mode 1)
+    :config
+    (add-to-list 'yas-prompt-functions 'shk-yas/helm-prompt)
+    (diminish 'yas-minor-mode))
+#+END_SRC
+
+*** Helm
+
+Huge interaction usability increase with this little package. Works like
+QuickSilver on the Mac to make things very simple.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package helm
+    :ensure
+    :diminish helm-mode
+    :bind (("M-x"     . helm-M-x)
+           ("C-x b"   . helm-mini)
+           ("C-c j"   . helm-semantic-or-imenu)
+           ("M-s o"   . helm-occur)
+           ("C-h a"   . helm-apropos)
+           ("C-c RET" . helm-resume)
+           ("C-h SPC" . helm-all-mark-rings)
+           ("C-h r"   . helm-register)
+           ("M-y"     . helm-show-kill-ring))
+    :init
+    (require 'helm-config)
+
+    (setq helm-idle-delay 0.0
+          helm-input-idle-delay 0.01
+          helm-quick-update t
+          helm-ff-skip-boring-files t)
+
+    (helm-mode 1))
+#+END_SRC
+
+**** =helm-projectile=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package helm-projectile
+    :ensure
+    :init (progn
+                 (setq projectile-completion-system 'helm)
+                 (helm-projectile-on)))
+#+END_SRC
+
+**** =helm-company=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package helm-company
+    :ensure
+    :init (progn
+            (define-key company-mode-map (kbd "C-:") 'helm-company)
+            (define-key company-active-map (kbd "C-:") 'helm-company)))
+#+END_SRC
+
+**** =helm-dash=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package helm-dash
+    :ensure)
+#+END_SRC
+
+**** =helm-flycheck=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package helm-flycheck
+    :ensure)
+#+END_SRC
+
+**** =helm-c-yasnippet=
+
+#+BEGIN_SRC emacs-lisp
+  (use-package helm-c-yasnippet
     :ensure)
 #+END_SRC
 
@@ -400,12 +774,16 @@ other, more "modern" editors have.
           rcirc-auto-authenticate t
           rcirc-default-nick "texel"
           rcirc-default-user-name "texel"
-          rcirc-default-user-full-name "June Tate-Gans")
+          rcirc-default-user-full-name "June Tate-Gans"
           rcirc-authinfo `("freenode" nickserv "texel" ,(rcirc-get-nick-pass "irc.freenode.net" "texel"))
+          rcirc-buffer-maximum-lines 10000
+          rcirc-kill-channel-buffers t)
+          
 
     (set-face-foreground 'rcirc-my-nick "yellow" nil)
     (add-to-list 'window-size-change-functions 'dim:dynamic-fill-column)
-    (add-hook 'rcirc-mode-hook 'flyspell-mode))
+    (add-hook 'rcirc-mode-hook 'flyspell-mode)
+    (rcirc-track-minor-mode))
 #+END_SRC
 
 * Non-package Key Bindings
@@ -428,6 +806,7 @@ emacs from the get-go.
              ("M-%"   . query-replace-regexp)
 
              ("M-SPC" . pop-mark)
+             ("C-a"   . beginning-of-line-dwim)
 
              ("M-F" . subword-forward)
              ("M-B" . subword-backward)
@@ -446,7 +825,8 @@ emacs from the get-go.
              ("C-c t 9" . (lambda () (interactive) (jtg:jump-to-or-start-term 9))))
 
   ;; Generally, it makes no sense to suspend emacs when emacs can do /everything/.
-  (global-unset-key "\C-z")
+  (setq cannot-suspend t)
+  (unbind-key "\C-z")
 #+END_SRC
 
 * General Emacs Tweaks
@@ -456,7 +836,7 @@ Things that don't relate to packages or are generalized emacs settings go here.
 ** Stop Emacs from GCing the world
 
 #+BEGIN_SRC emacs-lisp
-  ;; Keep emacs from stopping the world all that often.
+  ;; Only GC when we hit a threshold of 10MB of RAM
   (setq-default gc-cons-threshold 10000000)
 #+END_SRC
 
@@ -474,23 +854,6 @@ Tabs are evil, but we still have to live with them.
 #+BEGIN_SRC emacs-lisp
   (setq-default indicate-empty-lines t
                 indicate-buffer-boundaries t)
-#+END_SRC
-
-** No scroll, menu, or anything bars
-
-#+BEGIN_SRC emacs-lisp
-  (setq default-frame-alist '((menu-bar-lines . 0)
-                              (tool-bar-lines . 0)
-                              (vertical-scroll-bars)))
-#+END_SRC
-
-** URL browsing
-
-I should make this platform dependent.
-
-#+BEGIN_SRC emacs-lisp
-  (setq browse-url-browser-function 'browse-url-generic
-        browse-url-generic-program "xdg-open")
 #+END_SRC
 
 ** Enable =narrow-to-region=
@@ -532,7 +895,9 @@ place.
         delete-old-versions t
         kept-new-versions 24
         kept-old-version 12
-        version-control t)
+        make-backup-files t
+        version-control t
+        vc-make-backup-files t)
 
   ;; stop dropping nuisance lockfiles everywhere
   (setq create-lockfiles nil)
@@ -561,28 +926,50 @@ I like to type in Japanese, so let's tell MULE about that.
                 transient-mark-mode nil
                 require-final-newline t
                 scroll-conservatively 101
-                truncate-lines t)
+                truncate-lines t
+                echo-keystrokes 0.1
+                )
 
   (setq parens-require-spaces nil
-        make-backup-files nil
         diff-switches "-u"
         inhibit-splash-screen t
         visible-bell 1
-        blink-cursor-blinks -1)
+        blink-cursor-blinks -1
+        )
 
   (display-time)
   (show-paren-mode t)
   (blink-cursor-mode t)
+  (global-hl-line-mode)
   (prefer-coding-system 'utf-8)
 #+END_SRC
 
 * Programming Customizations
 ** Emacs Lisp
 
+Eldoc is too useful to not have on -- so we enable it!
+
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'emacs-lisp-mode-hook 'jtg:lambda-to-λ)
-  (add-hook 'emacs-lisp-mode-hook 'eldoc-mode)
-  (add-hook 'lisp-interaction-mode-hook 'eldoc-mode)
+  (use-package eldoc
+    :diminish eldoc-mode
+    :commands turn-on-eldoc-mode
+    :init
+    (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
+    (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode))
+#+END_SRC
+
+As it turns out, the dash library also provides font lock keywords for its
+macros and functions.
+
+#+BEGIN_SRC emacs-lisp
+  (eval-after-load "dash" '(dash-enable-font-lock))
+#+END_SRC
+
+Define some useful key bindings specific for elisp editing.
+
+#+BEGIN_SRC emacs-lisp
+  (bind-key "C-c C-c" 'comment-region lisp-mode-shared-map)
+  (bind-key "M-." 'find-function-at-point emacs-lisp-mode-map)
 #+END_SRC
 
 ** C programming
@@ -615,6 +1002,16 @@ Stuff that is generally set for all modes, such as arbitrary modes that
                           (other . "bsd")))
 #+END_SRC
 
+* Text Customizations
+** Single-space sentences
+
+Seriously, does /anyone/ type with two spaces at the end of a period in a fixed
+width font nowadays? No? Then why should I?
+
+#+BEGIN_SRC emacs-lisp
+(setq sentence-end-double-space nil)
+#+END_SRC
+
 * Other Customizations
 ** =ansi-term= terminal tweaks
 
@@ -639,12 +1036,19 @@ Stuff that is generally set for all modes, such as arbitrary modes that
         uniquify-ignore-buffers-re "^\\*")
 #+END_SRC
 
-** Remember minibuffer history
+** Remember bits of history
 
 #+BEGIN_SRC emacs-lisp
-  (setq savehist-additional-variables '(search ring regexp-search-ring)
+  (setq savehist-additional-variables '(kill-ring
+                                        search
+                                        search-ring
+                                        ring
+                                        regexp-search-ring)
         savehist-autosave-interval 60
-        savehist-file (concat user-emacs-directory "savehist"))
+        savehist-save-minibuffer-history 1
+        savehist-file (concat user-emacs-directory "savehist")
+        history-length t
+        history-delete-duplicates t)
 
   (savehist-mode t)
 #+END_SRC
