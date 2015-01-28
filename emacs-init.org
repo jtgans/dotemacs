@@ -652,7 +652,8 @@ Really useful, lighter weight replacement to flymake.
           js2-mode-squeeze-spaces nil
           js2-highlight-level 3
           js2-cleanup-whitespace t
-          js2-enter-indents-newline t))
+          js2-enter-indents-newline t)
+    (add-hook 'js2-mode-hook 'auto-fill-mode))
 #+END_SRC
 
 *** C# mode
@@ -1096,7 +1097,11 @@ editing themes more often now.
   (add-hook 'emacs-lisp-mode-hook 'hexcolor-add-to-font-lock)
 #+END_SRC
 
-** C programming
+** C/C++ programming
+
+*** C style
+   
+I prefer the Google C style when possible.
 
 #+BEGIN_SRC emacs-lisp
   (use-package google-c-style
@@ -1104,7 +1109,15 @@ editing themes more often now.
     :config
     (add-hook 'c-mode-common-hook 'google-set-c-style)
     (add-hook 'c-mode-common-hook 'google-make-newline-indent))
+#+END_SRC
 
+*** TODO Common hooks and settings
+
+: Are these c-style settings even valid anymore now that I use =google-c-style=?
+: Should they be reincorporated for my personal stuff, or do I want to use
+: Google's style?
+
+#+BEGIN_SRC emacs-lisp
   (eval-after-load 'cc-mode
     '(progn
        (setq-default c-indent-level 4
@@ -1116,9 +1129,9 @@ editing themes more often now.
 
        (add-hook 'c-mode-common-hook 'fci-mode)
        (add-hook 'c-mode-common-hook 'linum-mode)
+       (add-hook 'c-mode-common-hook 'auto-fill-mode)
 
-       (bind-keys :map c-mode-map
-                  ("RET" 'newline-and-indent))))
+       (bind-keys :map c-mode-map ("RET" 'newline-and-indent))))
 #+END_SRC
 
 ** Generalized Programming Settings
@@ -1142,8 +1155,20 @@ width font nowadays? No? Then why should I?
 (setq sentence-end-double-space nil)
 #+END_SRC
 
+** Auto fill for text mode 
+
+Why would this never be on? Seriously?
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'text-mode-hook 'auto-fill-mode)
+#+END_SRC
+
 * Other Customizations
 ** =ansi-term= terminal tweaks
+
+=ansi-term= is great when you want an xterm inside of emacs. Unfortunately, it
+has crazy bindings for swapping between acting like a normal emacs buffer and a
+terminal. I've altered it to only use one key instead.
 
 #+BEGIN_SRC emacs-lisp
   (eval-after-load 'term
