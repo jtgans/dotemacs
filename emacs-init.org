@@ -379,7 +379,6 @@ instead to check if it's available and install it directly if not.
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :ensure
-    :bind ("C-x g" . magit-status)
     :init
     (require 'magit)
     (magit-auto-revert-mode t)
@@ -923,6 +922,7 @@ had my own custom prefix key, anyway.
   (bind-keys :prefix-map jtg:jump-map
              :prefix-docstring "Personal keymap used for custom key definitions."
              :prefix "C-x j"
+             ("g" . magit-status)
              ("I" . find-init-file)
              ("R" . reload-init-file))
 #+END_SRC
