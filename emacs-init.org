@@ -176,6 +176,14 @@ here if I can.
     (insert-date)
     (insert " ")
     (insert-time))
+
+  (defun find-init-file ()
+    (interactive)
+    (find-file (expand-file-name "emacs-init.org" user-emacs-directory)))
+
+  (defun reload-init-file ()
+    (interactive)
+    (org-babel-load-file (expand-file-name "emacs-init.org" user-emacs-directory)))
 #+END_SRC
 
 ** Unity Defuns
@@ -823,11 +831,26 @@ QuickSilver on the Mac to make things very simple.
 
 * Non-package Key Bindings
 
-This is where I stuff arbitrary one-off keybindings that should have been in
-emacs from the get-go.
+This is where I setup my generalized key bindings that don't directly affect a
+given mode. I much prefer using John Wiegley's =bind-key= package to manage
+these bindings -- it helps to eliminate most of the boilerplate.
 
 #+BEGIN_SRC emacs-lisp
   (require 'bind-key)
+#+END_SRC
+
+** Emacs editing adjustments
+
+These are keybindings that make emacs a bit more bearable. I don't really need
+the crazy levels of customizability that things like paredit mode have. Just a
+few extra shortcuts with insert-pair are enough. Also, since I'm multi-platform,
+I sometimes have to make allowances for keyboards that may not have keys I need,
+or where remapping them is intractable (such as grave/hyper).
+
+#+BEGIN_SRC emacs-lisp
+  ;; Needed for the zap-up-to-char defun.
+  (require 'misc)
+
   (bind-keys ("M-\""  . insert-pair)
              ("M-'"   . insert-pair)
              ("M-["   . insert-pair)
@@ -843,25 +866,56 @@ emacs from the get-go.
              ("M-SPC" . pop-mark)
              ("C-a"   . beginning-of-line-dwim)
 
-             ("M-F" . subword-forward)
-             ("M-B" . subword-backward)
+             ("M-F"   . subword-forward)
+             ("M-B"   . subword-backward)
 
-             ("M-z" . zap-up-to-char)
-             
-             ("C-c t 0" . (lambda () (interactive) (jtg:jump-to-or-start-term 0)))
-             ("C-c t 1" . (lambda () (interactive) (jtg:jump-to-or-start-term 1)))
-             ("C-c t 2" . (lambda () (interactive) (jtg:jump-to-or-start-term 2)))
-             ("C-c t 3" . (lambda () (interactive) (jtg:jump-to-or-start-term 3)))
-             ("C-c t 4" . (lambda () (interactive) (jtg:jump-to-or-start-term 4)))
-             ("C-c t 5" . (lambda () (interactive) (jtg:jump-to-or-start-term 5)))
-             ("C-c t 6" . (lambda () (interactive) (jtg:jump-to-or-start-term 6)))
-             ("C-c t 7" . (lambda () (interactive) (jtg:jump-to-or-start-term 7)))
-             ("C-c t 8" . (lambda () (interactive) (jtg:jump-to-or-start-term 8)))
-             ("C-c t 9" . (lambda () (interactive) (jtg:jump-to-or-start-term 9))))
+             ("M-z"   . zap-up-to-char))
+#+END_SRC
 
-  ;; Generally, it makes no sense to suspend emacs when emacs can do /everything/.
+** Disable suspend
+
+Emacs multi-tty functionality tends to behave very badly when it comes to
+suspending, so I have to disable it manually here. Usually if I'm in emacs
+anyway, I want to stay there -- suspending it doesn't make sense.
+
+#+BEGIN_SRC emacs-lisp
   (setq cannot-suspend t)
   (unbind-key "\C-z")
+#+END_SRC
+
+** Personal Jump Map
+
+I've decided it's time to try to centralize and manage my keybinds a bit better
+than I have been. I'm "running out of keys" so to speak, and it's about time I
+had my own custom prefix key, anyway.
+
+#+BEGIN_SRC emacs-lisp
+  (bind-keys :prefix-map jtg:jump-map
+             :prefix-docstring "Personal keymap used for custom key definitions."
+             :prefix "C-x j"
+             ("I" . find-init-file)
+             ("R" . reload-init-file))
+#+END_SRC
+
+** =ansi-term= multi instance keymap
+
+I find it really handy to have multiple =ansi-term= sessions running at once in
+emacs -- especially when it's daemonized.
+
+#+BEGIN_SRC emacs-lisp
+  (bind-keys :prefix-map jtg:term-map
+             :prefix-docstring "Keymap used to jump between multiple ansi-term instances."
+             :prefix "C-c t"
+             ("0" . (lambda () (interactive) (jtg:jump-to-or-start-term 0)))
+             ("1" . (lambda () (interactive) (jtg:jump-to-or-start-term 1)))
+             ("2" . (lambda () (interactive) (jtg:jump-to-or-start-term 2)))
+             ("3" . (lambda () (interactive) (jtg:jump-to-or-start-term 3)))
+             ("4" . (lambda () (interactive) (jtg:jump-to-or-start-term 4)))
+             ("5" . (lambda () (interactive) (jtg:jump-to-or-start-term 5)))
+             ("6" . (lambda () (interactive) (jtg:jump-to-or-start-term 6)))
+             ("7" . (lambda () (interactive) (jtg:jump-to-or-start-term 7)))
+             ("8" . (lambda () (interactive) (jtg:jump-to-or-start-term 8)))
+             ("9" . (lambda () (interactive) (jtg:jump-to-or-start-term 9))))
 #+END_SRC
 
 * General Emacs Tweaks
