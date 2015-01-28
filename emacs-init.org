@@ -1169,9 +1169,7 @@ I prefer the Google C style when possible.
 
        (add-hook 'c-mode-common-hook #'fci-mode)
        (add-hook 'c-mode-common-hook #'linum-mode)
-       (add-hook 'c-mode-common-hook #'auto-fill-mode)
-
-       (bind-keys :map c-mode-map ("RET" 'newline-and-indent))))
+       (add-hook 'c-mode-common-hook #'auto-fill-mode)))
 #+END_SRC
 
 ** Generalized Programming Settings
