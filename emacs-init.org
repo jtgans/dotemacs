@@ -249,6 +249,23 @@ functionality, so I prefer to turn it off using [[https://github.com/magit/magit
   (face-remap-add-relative 'magit-item-highlight '()))
 #+END_SRC 
 
+*** Make magit run full-frame
+
+Borrowed from [[http://whattheemacsd.com/setup-magit.el-01.html][whattheemacsd.com]]
+
+#+BEGIN_SRC emacs-lisp
+  (defadvice magit-status (around magit-fullscreen activate)
+    (window-configuration-to-register :magit-fullscreen)
+    ad-do-it
+    (delete-other-windows))
+
+  (defun magit-quit-session ()
+    "Restores the previous window configuration and kills the magit buffer"
+    (interactive)
+    (kill-buffer)
+    (jump-to-register :magit-fullscreen))
+#+END_SRC
+
 *** rcirc-related helpers
 
 Not sure where I grabbed some of these defuns from.
@@ -330,20 +347,21 @@ instead to check if it's available and install it directly if not.
 *** magit
 
 #+BEGIN_SRC emacs-lisp
-    (use-package magit
-      :ensure
-      :bind ("C-x g" . magit-status)
-      :init
-      (require 'magit)
-      (magit-auto-revert-mode t)
-      :config
-      (diminish 'magit-auto-revert-mode)
+  (use-package magit
+    :ensure
+    :bind ("C-x g" . magit-status)
+    :init
+    (require 'magit)
+    (magit-auto-revert-mode t)
+    :config
+    (diminish 'magit-auto-revert-mode)
+    (define-key magit-status-mode-map (kbd "q") 'magit-quit-session)
 
-      (setq magit-diff-use-overlays nil)
-      
-      (add-hook 'magit-status-mode-hook 'disable-magit-highlight-in-buffer)
-      (add-hook 'magit-diff-mode-hook 'disable-magit-highlight-in-buffer)
-      (add-hook 'magit-log-edit-mode-hook 'auto-fill-mode))
+    (setq magit-diff-use-overlays nil)
+    
+    (add-hook 'magit-status-mode-hook 'disable-magit-highlight-in-buffer)
+    (add-hook 'magit-diff-mode-hook 'disable-magit-highlight-in-buffer)
+    (add-hook 'magit-log-edit-mode-hook 'auto-fill-mode))
 #+END_SRC
 
 **** magit-annex
