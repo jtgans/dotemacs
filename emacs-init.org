@@ -800,6 +800,7 @@ QuickSilver on the Mac to make things very simple.
     :diminish helm-mode
     :bind (("M-x"     . helm-M-x)
            ("C-x b"   . helm-mini)
+           ("C-x C-b" . helm-buffers-list)
            ("C-c j"   . helm-semantic-or-imenu)
            ("M-s o"   . helm-occur)
            ("C-h a"   . helm-apropos)
