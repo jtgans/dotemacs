@@ -29,6 +29,7 @@
      - [[#disable-suspend][Disable suspend]]
      - [[#personal-jump-map][Personal Jump Map]]
      - [[#ansi-term-multi-instance-keymap][=ansi-term= multi instance keymap]]
+     - [[#eww-key-binding-tweaks][=eww= key binding tweaks]]
  - [[#general-emacs-tweaks][General Emacs Tweaks]]
      - [[#stop-emacs-from-gcing-the-world][Stop Emacs from GCing the world]]
      - [[#tabs][Tabs]]
@@ -934,6 +935,17 @@ emacs -- especially when it's daemonized.
              ("7" . (lambda () (interactive) (jtg:jump-to-or-start-term 7)))
              ("8" . (lambda () (interactive) (jtg:jump-to-or-start-term 8)))
              ("9" . (lambda () (interactive) (jtg:jump-to-or-start-term 9))))
+#+END_SRC
+
+** =eww= key binding tweaks
+
+Eww is cool and all, but a little weird. The key bindings are a bit strange, and
+the buffer doesn't start out in read-only mode.
+
+#+BEGIN_SRC emacs-lisp
+  (bind-keys :map eww-mode-map
+             ("<backtab>" . shr-previous-link)
+             ("<S-tab>"   . shr-previous-link))
 #+END_SRC
 
 * General Emacs Tweaks
