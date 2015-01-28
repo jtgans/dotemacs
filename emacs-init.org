@@ -347,6 +347,18 @@ folks.
           js2-enter-indents-newline t))
 #+END_SRC
 
+*** C# mode
+
+This is yet another handy mode for editing C# files. Quite useful, though I
+don't do much in the way of customization. Probably should, though.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package csharp-mode
+    :ensure
+    :config (progn (add-hook 'csharp-mode-hook 'fci-mode)
+                   (add-hook 'csharp-mode-hook 'company-mode)))
+#+END_SRC
+
 *** Semantic
 
 Semantic is great for doing crazy amounts of structured editing in C and C++
