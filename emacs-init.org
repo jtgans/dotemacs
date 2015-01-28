@@ -231,6 +231,23 @@ here if I can.
       nil))
 #+END_SRC
 
+*** From [[http://www.emacswiki.org/emacs/HexColour]]
+
+Handy bit of code to colorize HTML-style RGB strings with their actual values.
+I've adjusted it to use American english names.
+
+#+BEGIN_SRC emacs-lisp
+  (defvar hexcolor-keywords
+    '(("#[abcdef[:digit:]]\\{6\\}"
+       (0 (put-text-property (match-beginning 0)
+                             (match-end 0)
+                             'face (list :background 
+                                         (match-string-no-properties 0)))))))
+
+  (defun hexcolor-add-to-font-lock ()
+    (font-lock-add-keywords nil hexcolor-keywords))
+#+END_SRC
+
 *** Back to indentation or actual beginning-of-line
 
 Borrowed from [[https://github.com/Wilfred/.emacs.d/blob/gh-pages/init.org#by-symbol][Wilfred's init.org]].
@@ -1028,6 +1045,8 @@ I like to type in Japanese, so let's tell MULE about that.
 * Programming Customizations
 ** Emacs Lisp
 
+Various tweaks to make editing elisp easier.
+
 *** Eldoc 
 
 Eldoc is too useful to not have on -- so we enable it!
@@ -1062,10 +1081,12 @@ Define some useful key bindings specific for elisp editing.
 *** Prettification
 
 Emacs provides a built-in minor mode that converts words to symbols such as
-lambda.
+lambda. Also, I add the hook for hexcolor here as well, since I seem to be
+editing themes more often now.
 
 #+BEGIN_SRC emacs-lisp
   (add-hook 'emacs-lisp-mode-hook 'prettify-symbols-mode)
+  (add-hook 'emacs-lisp-mode-hook 'hexcolor-add-to-font-lock)
 #+END_SRC
 
 ** C programming
