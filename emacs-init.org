@@ -529,6 +529,7 @@ folks.
 
 #+BEGIN_SRC emacs-lisp
   (use-package footnote-mode
+    :ensure
     :config
     (setq footnote-prefix (kbd "C-c f")
           footnote-section-tag ""
