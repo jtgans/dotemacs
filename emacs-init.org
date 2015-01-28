@@ -359,8 +359,10 @@ instead to check if it's available and install it directly if not.
 
     (setq magit-diff-use-overlays nil)
     
-    (add-hook 'magit-status-mode-hook 'disable-magit-highlight-in-buffer)
-    (add-hook 'magit-diff-mode-hook 'disable-magit-highlight-in-buffer)
+    (dolist (hook (list 'magit-process-mode-hook
+                        'magit-status-mode-hook
+                        'magit-diff-mode-hook))
+      (add-hook hook 'disable-magit-highlight-in-buffer))
     (add-hook 'magit-log-edit-mode-hook 'auto-fill-mode))
 #+END_SRC
 
