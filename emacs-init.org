@@ -295,19 +295,7 @@ the start of the line."
       (move-beginning-of-line nil))))
 #+END_SRC 
 
-*** Eliminate magit higlighting
-
-Magit has this really annoying habit of highlighting the current chunk in a
-really garish color background. Worse, it uses overlays to ensure colors show up
-right over the background. I don't care for either of those bits of
-functionality, so I prefer to turn it off using [[https://github.com/magit/magit/issues/133][DarwinAwardWinner's fix]].
-
-#+BEGIN_SRC emacs-lisp
-(defun disable-magit-highlight-in-buffer () 
-  (face-remap-add-relative 'magit-item-highlight '()))
-#+END_SRC 
-
-*** Make magit run full-frame
+*** Make magit run full-frame                                         :magit:
 
 Borrowed from [[http://whattheemacsd.com/setup-magit.el-01.html][whattheemacsd.com]]
 
@@ -412,15 +400,7 @@ instead to check if it's available and install it directly if not.
     (magit-auto-revert-mode t)
     :config
     (diminish 'magit-auto-revert-mode)
-    (define-key magit-status-mode-map (kbd "q") 'magit-quit-session)
-
-    (setq magit-diff-use-overlays nil)
-    
-    (dolist (hook (list 'magit-process-mode-hook
-                        'magit-status-mode-hook
-                        'magit-diff-mode-hook))
-      (add-hook hook #'disable-magit-highlight-in-buffer))
-    (add-hook 'magit-log-edit-mode-hook #'auto-fill-mode))
+    (define-key magit-status-mode-map (kbd "q") 'magit-quit-session))
 #+END_SRC
 
 **** magit-annex

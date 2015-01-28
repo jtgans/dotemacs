@@ -23,7 +23,7 @@
  '(magit-log-head-label-remote ((t (:foreground "#65b042"))))
  '(magit-branch ((t (:foreground "#fbde2d"))))
  '(magit-section-title ((t (:foreground "#adc6ee"))))
- '(magit-item-highlight ((t (:background "#6c91be"))))
+ '(magit-item-highlight ((t (:background "#303030"))))
  
  ;; hl-line-mode
  '(hl-line-face ((t (:background "#2b2b2b"))))
