@@ -217,6 +217,13 @@ here if I can.
   (defun reload-init-file ()
     (interactive)
     (org-babel-load-file (expand-file-name "emacs-init.org" user-emacs-directory)))
+
+  (require 'netrc)
+
+  (defun rcirc-get-nick-pass (server nick)
+    "Return the password for the given nick to send to nickserv."
+    (let ((tokens (netrc-machine (netrc-parse) server)))
+      (netrc-get tokens "password")))
 #+END_SRC
 
 ** Unity Defuns
@@ -312,13 +319,15 @@ Borrowed from [[http://whattheemacsd.com/setup-magit.el-01.html][whattheemacsd.c
     (jump-to-register :magit-fullscreen))
 #+END_SRC
 
-*** rcirc-related helpers
+*** Make rcirc dynamically fill                                       :rcirc:
 
-Not sure where I grabbed some of these defuns from.
+This code is borrowed from [[http://www.emacswiki.org/emacs/rcircAutoFillColumn]].
+
+Effectively this allows rcirc to re-wrap IRC lines that don't fit dynamically.
+It's not a perfect solution since prior lines won't be updated, but it's good
+enough.
 
 #+BEGIN_SRC emacs-lisp
-  (require 'netrc)
-
   (defvar dim:dynamic-fill-column-margin 3
     "Safety margin used to calculate fill-column depending on window-width")
 
@@ -333,11 +342,6 @@ Not sure where I grabbed some of these defuns from.
   (defun dim:dynamic-fill-column (frame)
     "Dynamically tune fill-column for a frame's windows at redisplay time"
     (walk-windows 'dim:dynamic-fill-column-window 'no-minibuf frame))
-
-  (defun rcirc-get-nick-pass (server nick)
-    "Return the password for the given nick to send to nickserv."
-    (let ((tokens (netrc-machine (netrc-parse) server)))
-      (netrc-get tokens "password")))
 #+END_SRC
 
 * Add-on Packages
