@@ -60,10 +60,37 @@ Seth!
 
 Just stick this in the [[~/.emacs.d/init.el][init.el]]:
 
-#+BEGIN_EXAMPLE
-;; Emacs initialization is handled in the emacs-init.org file.
-(org-babel-load-file (expand-file-name "emacs-init.org" user-emacs-directory))
+#+BEGIN_EXAMPLE emacs-lisp
+  ;; Emacs initialization is handled in the init.org file.
+
+  (defconst jtg:org-init-filename (expand-file-name "emacs-init.org" user-emacs-directory)
+    "The filename for the org-mode init file.")
+
+  (defconst jtg:generated-init-filename (expand-file-name "emacs-init.el" user-emacs-directory)
+    "The filename for the elisp init file generated from `jtg:org-init-filename'.")
+
+  (defun jtg:load-init-from-org ()
+    "Loads emacs' initialization file from the org-mode init file."
+    (let* ((org-init-attrs (file-attributes jtg:org-init-filename))
+           (org-init-mtime (nth 5 org-init-attrs))
+           (generated-init-attrs (file-attributes jtg:generated-init-filename))
+           (generated-init-mtime (nth 5 generated-init-attrs)))
+      (if (or (null generated-init-mtime)
+              (time-less-p generated-init-mtime org-init-mtime))
+          (progn
+            (org-babel-load-file jtg:org-init-filename)
+            (message (concat "Regenerated init from " jtg:org-init-filename)))
+        (progn
+          (load jtg:generated-init-filename)
+          (message (concat "Loaded cached init from " jtg:generated-init-filename))))))
+
+  (jtg:load-init-from-org)
 #+END_EXAMPLE
+
+This chunk of code loads the init file from this =org-mode= file, but only if
+this file is newer than the generated elisp file. Neat, huh? It's a bit more
+complicated than just a plain 'ol call to =org-babel-load-file=, but it's faster
+since it doesn't regenerate things needlessly.
 
 * Super early customization
 
@@ -73,9 +100,10 @@ junk as I can from the get-go.
 #+BEGIN_SRC emacs-lisp
   (require 'cl)
 
-  (setq default-frame-alist '((menu-bar-lines . 0)
+  (setq initial-frame-alist '((menu-bar-lines . 0)
                               (tool-bar-lines . 0)
-                              (vertical-scroll-bars)))
+                              (vertical-scroll-bars))
+        default-frame-alist initial-frame-alist)
 #+END_SRC
 
 * Customize custom file
@@ -133,11 +161,11 @@ here if I can.
 ** My Custom Defuns
 
 #+BEGIN_SRC emacs-lisp
-  (defun jtg:jump-to-or-start-term (num)
+  (defun jtg:jump-to-or-start-term (ch)
     "Function to force the current window to switch to or restart the given term
-    number."
-    (interactive)
-    (let* ((raw-buffer-name (format "ansiterm-%d" num))
+  character."
+    (interactive "c")
+    (let* ((raw-buffer-name (format "ansiterm-%c" ch))
            (actual-buffer-name (concat "*" raw-buffer-name "*")))
       (if (member actual-buffer-name (mapcar 'buffer-name (buffer-list)))
           (switch-to-buffer actual-buffer-name)
@@ -153,7 +181,7 @@ here if I can.
   (defun jtg:host-onlinep (host &optional port)
     "Check to see if this emacs instance can connect to given HOST on PORT.
 
-    If PORT is not specified, then it defaults to 80."
+  If PORT is not specified, then it defaults to 80."
     (when (null port) (setq port 80))
     (not (condition-case nil
              (delete-process
@@ -391,8 +419,8 @@ instead to check if it's available and install it directly if not.
     (dolist (hook (list 'magit-process-mode-hook
                         'magit-status-mode-hook
                         'magit-diff-mode-hook))
-      (add-hook hook 'disable-magit-highlight-in-buffer))
-    (add-hook 'magit-log-edit-mode-hook 'auto-fill-mode))
+      (add-hook hook #'disable-magit-highlight-in-buffer))
+    (add-hook 'magit-log-edit-mode-hook #'auto-fill-mode))
 #+END_SRC
 
 **** magit-annex
@@ -509,7 +537,7 @@ Go read [[http://orgmode.org/manual/][the manual]]!
           org-src-lang-modes '(("elisp" . emacs-lisp)
                                ("dot"   . fundamental)))
     :config
-    (add-hook 'org-mode-hook 'auto-fill-mode))
+    (add-hook 'org-mode-hook #'auto-fill-mode))
 #+END_SRC
 
 **** =org-toc=
@@ -521,7 +549,7 @@ embedded on it.
   (use-package org-toc
     :ensure
     :init
-    (add-hook 'org-mode-hook 'org-toc-enable))
+    (add-hook 'org-mode-hook #'org-toc-enable))
 #+END_SRC
 
 **** =org-capture=
@@ -665,7 +693,7 @@ Really useful, lighter weight replacement to flymake.
           js2-highlight-level 3
           js2-cleanup-whitespace t
           js2-enter-indents-newline t)
-    (add-hook 'js2-mode-hook 'auto-fill-mode))
+    (add-hook 'js2-mode-hook #'auto-fill-mode))
 #+END_SRC
 
 *** C# mode
@@ -683,8 +711,8 @@ don't do much in the way of customization. Probably should, though.
                              :command ("python" (eval (concat (projectile-project-root) "make.py")) "fast" (eval (projectile-project-root)) source-original source)
                              :error-patterns ((warning line-start (file-name) "(" line (zero-or-more not-newline) "): " (message) line-end)
                                               (error line-start (file-name) "(" line (zero-or-more not-newline) "): " (message) line-end)))
-    (add-hook 'csharp-mode-hook 'fci-mode)
-    (add-hook 'csharp-mode-hook 'company-mode))
+    (add-hook 'csharp-mode-hook #'fci-mode)
+    (add-hook 'csharp-mode-hook #'company-mode))
 #+END_SRC
 
 *** Swift mode
@@ -752,7 +780,7 @@ just like how git does.
     :diminish yasnippet-mode
     :commands yas-global-mode
     :init
-    (add-hook 'hippie-expand-try-functions-list 'yas-hippie-try-expand)
+    (add-hook 'hippie-expand-try-functions-list #'yas-hippie-try-expand)
     (yas-global-mode 1)
     :config
     (add-to-list 'yas-prompt-functions 'shk-yas/helm-prompt)
@@ -854,7 +882,7 @@ QuickSilver on the Mac to make things very simple.
 
     (set-face-foreground 'rcirc-my-nick "yellow" nil)
     (add-to-list 'window-size-change-functions 'dim:dynamic-fill-column)
-    (add-hook 'rcirc-mode-hook 'flyspell-mode)
+    (add-hook 'rcirc-mode-hook #'flyspell-mode)
     (rcirc-track-minor-mode))
 #+END_SRC
 
@@ -921,7 +949,8 @@ had my own custom prefix key, anyway.
 #+BEGIN_SRC emacs-lisp
   (bind-keys :prefix-map jtg:jump-map
              :prefix-docstring "Personal keymap used for custom key definitions."
-             :prefix "C-x j"
+             :prefix "C-c C-j"
+             ("e" . eww)
              ("g" . magit-status)
              ("I" . find-init-file)
              ("R" . reload-init-file))
@@ -933,19 +962,7 @@ I find it really handy to have multiple =ansi-term= sessions running at once in
 emacs -- especially when it's daemonized.
 
 #+BEGIN_SRC emacs-lisp
-  (bind-keys :prefix-map jtg:term-map
-             :prefix-docstring "Keymap used to jump between multiple ansi-term instances."
-             :prefix "C-c t"
-             ("0" . (lambda () (interactive) (jtg:jump-to-or-start-term 0)))
-             ("1" . (lambda () (interactive) (jtg:jump-to-or-start-term 1)))
-             ("2" . (lambda () (interactive) (jtg:jump-to-or-start-term 2)))
-             ("3" . (lambda () (interactive) (jtg:jump-to-or-start-term 3)))
-             ("4" . (lambda () (interactive) (jtg:jump-to-or-start-term 4)))
-             ("5" . (lambda () (interactive) (jtg:jump-to-or-start-term 5)))
-             ("6" . (lambda () (interactive) (jtg:jump-to-or-start-term 6)))
-             ("7" . (lambda () (interactive) (jtg:jump-to-or-start-term 7)))
-             ("8" . (lambda () (interactive) (jtg:jump-to-or-start-term 8)))
-             ("9" . (lambda () (interactive) (jtg:jump-to-or-start-term 9))))
+  (bind-key "C-c t" #'jtg:jump-to-or-start-term)
 #+END_SRC
 
 * General Emacs Tweaks
@@ -954,9 +971,19 @@ Things that don't relate to packages or are generalized emacs settings go here.
 
 ** Stop Emacs from GCing the world
 
+Emacs will by default start GCing at 800KiB of garbage. This is really low once
+you start to have a bunch of add-on packages loaded. I bump mine to 10MB since
+memory is relatively cheap on workstations.
+
+I also turn on garbage collection messages so I can see when things are going on
+in the background.
+
 #+BEGIN_SRC emacs-lisp
   ;; Only GC when we hit a threshold of 10MB of RAM
   (setq-default gc-cons-threshold 10000000)
+
+  ;; Enable garbage collection messages
+  (setq garbage-collection-messages t)
 #+END_SRC
 
 ** Tabs
@@ -1025,7 +1052,7 @@ place.
 ** Make URLs in Man clickable
 
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'Man-mode-hook 'goto-address)
+  (add-hook 'Man-mode-hook #'goto-address)
 #+END_SRC
 
 ** Input methods
@@ -1077,8 +1104,8 @@ Eldoc is too useful to not have on -- so we enable it!
     :diminish eldoc-mode
     :commands turn-on-eldoc-mode
     :init
-    (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
-    (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode))
+    (add-hook 'emacs-lisp-mode-hook #'turn-on-eldoc-mode)
+    (add-hook 'lisp-interaction-mode-hook #'turn-on-eldoc-mode))
 #+END_SRC
 
 *** Dash font-lock
@@ -1106,8 +1133,8 @@ lambda. Also, I add the hook for hexcolor here as well, since I seem to be
 editing themes more often now.
 
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'emacs-lisp-mode-hook 'prettify-symbols-mode)
-  (add-hook 'emacs-lisp-mode-hook 'hexcolor-add-to-font-lock)
+  (add-hook 'emacs-lisp-mode-hook #'prettify-symbols-mode)
+  (add-hook 'emacs-lisp-mode-hook #'hexcolor-add-to-font-lock)
 #+END_SRC
 
 ** C/C++ programming
@@ -1120,8 +1147,8 @@ I prefer the Google C style when possible.
   (use-package google-c-style
     :ensure
     :config
-    (add-hook 'c-mode-common-hook 'google-set-c-style)
-    (add-hook 'c-mode-common-hook 'google-make-newline-indent))
+    (add-hook 'c-mode-common-hook #'google-set-c-style)
+    (add-hook 'c-mode-common-hook #'google-make-newline-indent))
 #+END_SRC
 
 *** TODO Common hooks and settings
@@ -1140,11 +1167,9 @@ I prefer the Google C style when possible.
        (c-set-offset 'access-label '-2)
        (c-set-offset 'innamespace '0)
 
-       (add-hook 'c-mode-common-hook 'fci-mode)
-       (add-hook 'c-mode-common-hook 'linum-mode)
-       (add-hook 'c-mode-common-hook 'auto-fill-mode)
-
-       (bind-keys :map c-mode-map ("RET" 'newline-and-indent))))
+       (add-hook 'c-mode-common-hook #'fci-mode)
+       (add-hook 'c-mode-common-hook #'linum-mode)
+       (add-hook 'c-mode-common-hook #'auto-fill-mode)))
 #+END_SRC
 
 ** Generalized Programming Settings
@@ -1173,7 +1198,7 @@ width font nowadays? No? Then why should I?
 Why would this never be on? Seriously?
 
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'text-mode-hook 'auto-fill-mode)
+  (add-hook 'text-mode-hook #'auto-fill-mode)
 #+END_SRC
 
 * Other Customizations

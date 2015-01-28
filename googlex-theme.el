@@ -12,7 +12,8 @@
  '(region ((t (:background "#6c91be"))))
  '(fringe ((t (:background "#3f464c"))))
  '(header-line ((t (:foreground "#f0dfaf" :background "#2b2b2b"))))
- '(highlight ((t (:background "#2b2b2b"))))
+ '(highlight ((((min-colors 300)) (:background "#2b2b2b"))
+              (t (:background "#000000"))))
  
  '(minibuffer-prompt ((t (:foreground "#729fcf" :bold t))))
  
