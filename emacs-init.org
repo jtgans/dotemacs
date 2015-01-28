@@ -528,7 +528,7 @@ folks.
 *** =footnote-mode=
 
 #+BEGIN_SRC emacs-lisp
-  (use-package footnote-mode
+  (use-package footnote
     :ensure
     :config
     (setq footnote-prefix (kbd "C-c f")
