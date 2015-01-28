@@ -486,6 +486,7 @@ Go read [[http://orgmode.org/manual/][the manual]]!
     :mode ("\\.org$" . org-mode)
     :bind (("C-c c" . org-capture)
            ("C-c l" . org-store-link))
+    :pin "org"
     :init
     (setq-default major-mode 'org-mode)
     (setq org-directory          "~/Notebook/org"
