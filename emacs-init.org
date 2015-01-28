@@ -392,8 +392,8 @@ instead to check if it's available and install it directly if not.
     (dolist (hook (list 'magit-process-mode-hook
                         'magit-status-mode-hook
                         'magit-diff-mode-hook))
-      (add-hook hook 'disable-magit-highlight-in-buffer))
-    (add-hook 'magit-log-edit-mode-hook 'auto-fill-mode))
+      (add-hook hook #'disable-magit-highlight-in-buffer))
+    (add-hook 'magit-log-edit-mode-hook #'auto-fill-mode))
 #+END_SRC
 
 **** magit-annex
@@ -510,7 +510,7 @@ Go read [[http://orgmode.org/manual/][the manual]]!
           org-src-lang-modes '(("elisp" . emacs-lisp)
                                ("dot"   . fundamental)))
     :config
-    (add-hook 'org-mode-hook 'auto-fill-mode))
+    (add-hook 'org-mode-hook #'auto-fill-mode))
 #+END_SRC
 
 **** =org-toc=
@@ -522,7 +522,7 @@ embedded on it.
   (use-package org-toc
     :ensure
     :init
-    (add-hook 'org-mode-hook 'org-toc-enable))
+    (add-hook 'org-mode-hook #'org-toc-enable))
 #+END_SRC
 
 **** =org-capture=
@@ -666,7 +666,7 @@ Really useful, lighter weight replacement to flymake.
           js2-highlight-level 3
           js2-cleanup-whitespace t
           js2-enter-indents-newline t)
-    (add-hook 'js2-mode-hook 'auto-fill-mode))
+    (add-hook 'js2-mode-hook #'auto-fill-mode))
 #+END_SRC
 
 *** C# mode
@@ -684,8 +684,8 @@ don't do much in the way of customization. Probably should, though.
                              :command ("python" (eval (concat (projectile-project-root) "make.py")) "fast" (eval (projectile-project-root)) source-original source)
                              :error-patterns ((warning line-start (file-name) "(" line (zero-or-more not-newline) "): " (message) line-end)
                                               (error line-start (file-name) "(" line (zero-or-more not-newline) "): " (message) line-end)))
-    (add-hook 'csharp-mode-hook 'fci-mode)
-    (add-hook 'csharp-mode-hook 'company-mode))
+    (add-hook 'csharp-mode-hook #'fci-mode)
+    (add-hook 'csharp-mode-hook #'company-mode))
 #+END_SRC
 
 *** Swift mode
@@ -753,7 +753,7 @@ just like how git does.
     :diminish yasnippet-mode
     :commands yas-global-mode
     :init
-    (add-hook 'hippie-expand-try-functions-list 'yas-hippie-try-expand)
+    (add-hook 'hippie-expand-try-functions-list #'yas-hippie-try-expand)
     (yas-global-mode 1)
     :config
     (add-to-list 'yas-prompt-functions 'shk-yas/helm-prompt)
@@ -855,7 +855,7 @@ QuickSilver on the Mac to make things very simple.
 
     (set-face-foreground 'rcirc-my-nick "yellow" nil)
     (add-to-list 'window-size-change-functions 'dim:dynamic-fill-column)
-    (add-hook 'rcirc-mode-hook 'flyspell-mode)
+    (add-hook 'rcirc-mode-hook #'flyspell-mode)
     (rcirc-track-minor-mode))
 #+END_SRC
 
@@ -1025,7 +1025,7 @@ place.
 ** Make URLs in Man clickable
 
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'Man-mode-hook 'goto-address)
+  (add-hook 'Man-mode-hook #'goto-address)
 #+END_SRC
 
 ** Input methods
@@ -1077,8 +1077,8 @@ Eldoc is too useful to not have on -- so we enable it!
     :diminish eldoc-mode
     :commands turn-on-eldoc-mode
     :init
-    (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
-    (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode))
+    (add-hook 'emacs-lisp-mode-hook #'turn-on-eldoc-mode)
+    (add-hook 'lisp-interaction-mode-hook #'turn-on-eldoc-mode))
 #+END_SRC
 
 *** Dash font-lock
@@ -1106,8 +1106,8 @@ lambda. Also, I add the hook for hexcolor here as well, since I seem to be
 editing themes more often now.
 
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'emacs-lisp-mode-hook 'prettify-symbols-mode)
-  (add-hook 'emacs-lisp-mode-hook 'hexcolor-add-to-font-lock)
+  (add-hook 'emacs-lisp-mode-hook #'prettify-symbols-mode)
+  (add-hook 'emacs-lisp-mode-hook #'hexcolor-add-to-font-lock)
 #+END_SRC
 
 ** C/C++ programming
@@ -1120,8 +1120,8 @@ I prefer the Google C style when possible.
   (use-package google-c-style
     :ensure
     :config
-    (add-hook 'c-mode-common-hook 'google-set-c-style)
-    (add-hook 'c-mode-common-hook 'google-make-newline-indent))
+    (add-hook 'c-mode-common-hook #'google-set-c-style)
+    (add-hook 'c-mode-common-hook #'google-make-newline-indent))
 #+END_SRC
 
 *** TODO Common hooks and settings
@@ -1140,9 +1140,9 @@ I prefer the Google C style when possible.
        (c-set-offset 'access-label '-2)
        (c-set-offset 'innamespace '0)
 
-       (add-hook 'c-mode-common-hook 'fci-mode)
-       (add-hook 'c-mode-common-hook 'linum-mode)
-       (add-hook 'c-mode-common-hook 'auto-fill-mode)
+       (add-hook 'c-mode-common-hook #'fci-mode)
+       (add-hook 'c-mode-common-hook #'linum-mode)
+       (add-hook 'c-mode-common-hook #'auto-fill-mode)
 
        (bind-keys :map c-mode-map ("RET" 'newline-and-indent))))
 #+END_SRC
@@ -1173,7 +1173,7 @@ width font nowadays? No? Then why should I?
 Why would this never be on? Seriously?
 
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'text-mode-hook 'auto-fill-mode)
+  (add-hook 'text-mode-hook #'auto-fill-mode)
 #+END_SRC
 
 * Other Customizations
