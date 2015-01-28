@@ -29,7 +29,6 @@
      - [[#disable-suspend][Disable suspend]]
      - [[#personal-jump-map][Personal Jump Map]]
      - [[#ansi-term-multi-instance-keymap][=ansi-term= multi instance keymap]]
-     - [[#eww-key-binding-tweaks][=eww= key binding tweaks]]
  - [[#general-emacs-tweaks][General Emacs Tweaks]]
      - [[#stop-emacs-from-gcing-the-world][Stop Emacs from GCing the world]]
      - [[#tabs][Tabs]]
@@ -445,6 +444,18 @@ allows you to edit a list interactively.
 #+BEGIN_SRC emacs-lisp
   (use-package edit-list
     :ensure)
+#+END_SRC
+
+*** Emacs web wowser (=eww=)
+
+This thing is crazy. Emacs finally has a web browser built
+in. Unfortunately, the keymaps are a little weird.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package eww
+    :config
+    (bind-key "<backtab>" 'shr-previous-link eww-mode-map)
+    (bind-key "<S-tab>"   'shr-previous-link eww-mode-map))
 #+END_SRC
 
 *** Org mode
@@ -935,17 +946,6 @@ emacs -- especially when it's daemonized.
              ("7" . (lambda () (interactive) (jtg:jump-to-or-start-term 7)))
              ("8" . (lambda () (interactive) (jtg:jump-to-or-start-term 8)))
              ("9" . (lambda () (interactive) (jtg:jump-to-or-start-term 9))))
-#+END_SRC
-
-** =eww= key binding tweaks
-
-Eww is cool and all, but a little weird. The key bindings are a bit strange, and
-the buffer doesn't start out in read-only mode.
-
-#+BEGIN_SRC emacs-lisp
-  (bind-keys :map eww-mode-map
-             ("<backtab>" . shr-previous-link)
-             ("<S-tab>"   . shr-previous-link))
 #+END_SRC
 
 * General Emacs Tweaks
