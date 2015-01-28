@@ -418,18 +418,6 @@ larger chunks.
     :bind (("M-C-SPC" . er/expand-region)))
 #+END_SRC
 
-*** =pretty-mode=
-
-Converts silly things like the word =lambda= into the actual symbol. Much better
-than the usual one-offs I've written to do this job.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package pretty-mode
-    :ensure
-    :init
-    (global-pretty-mode t))
-#+END_SRC
-
 *** =edit-list=
 
 Something I tried to hack up using =gnus-eforms= but ultimately failed. This
