@@ -1028,6 +1028,8 @@ I like to type in Japanese, so let's tell MULE about that.
 * Programming Customizations
 ** Emacs Lisp
 
+*** Eldoc 
+
 Eldoc is too useful to not have on -- so we enable it!
 
 #+BEGIN_SRC emacs-lisp
@@ -1039,6 +1041,8 @@ Eldoc is too useful to not have on -- so we enable it!
     (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode))
 #+END_SRC
 
+*** Dash font-lock
+
 As it turns out, the dash library also provides font lock keywords for its
 macros and functions.
 
@@ -1046,11 +1050,22 @@ macros and functions.
   (eval-after-load "dash" '(dash-enable-font-lock))
 #+END_SRC
 
+*** Additional key bindings
+
 Define some useful key bindings specific for elisp editing.
 
 #+BEGIN_SRC emacs-lisp
   (bind-key "C-c C-c" 'comment-region lisp-mode-shared-map)
   (bind-key "M-." 'find-function-at-point emacs-lisp-mode-map)
+#+END_SRC
+
+*** Prettification
+
+Emacs provides a built-in minor mode that converts words to symbols such as
+lambda.
+
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'emacs-lisp-mode-hook 'prettify-symbols-mode)
 #+END_SRC
 
 ** C programming
