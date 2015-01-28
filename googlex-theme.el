@@ -4,7 +4,8 @@
 (custom-theme-set-faces
  'googlex
 
- '(default (( t (:background "#3f464c" :foreground "#eeeeec"))))
+ '(default ((((min-colors 88)) (:background "#00000" :foreground "#eeeeec"))
+            (t (:background "#3f464c" :foreground "#eeeeec"))))
  '(cursor ((t (:background "#fce94f"))))
  '(border ((t (:foreground "#ffffff"))))
  '(region ((t (:background "#6c91be"))))
