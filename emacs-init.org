@@ -526,23 +526,13 @@ Go read [[http://orgmode.org/manual/][the manual]]!
                                ("dot"   . fundamental)))
     :config
     (add-hook 'org-mode-hook #'auto-fill-mode)
+    (add-hook 'org-mode-hook #'flyspell-mode)
+
     (unbind-key "C-c C-j" org-mode-map)
     (bind-key "C-c C-g" #'org-goto org-mode-map))
 #+END_SRC
 
-**** =org-toc=
-
-Creates a simple table of contents on the first headline with a =:TOC:= tag
-embedded on it.
-
-#+BEGIN_SRC emacs-lisp
-  (use-package org-toc
-    :ensure
-    :init
-    (add-hook 'org-mode-hook #'org-toc-enable))
-#+END_SRC
-
-**** =org-capture=
+**** org-capture
 
 I keep notes for various TODOs, misc notes, and even notes for 1:1 meetings with
 folks.
