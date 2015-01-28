@@ -901,7 +901,7 @@ or where remapping them is intractable (such as grave/hyper).
              ("C-r"   . isearch-backward-regexp)
              ("M-%"   . query-replace-regexp)
 
-             ("M-SPC" . pop-mark)
+             ("M-SPC" . pop-to-mark-command)
              ("C-a"   . beginning-of-line-dwim)
 
              ("M-F"   . subword-forward)
