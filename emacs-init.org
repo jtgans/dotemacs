@@ -464,7 +464,8 @@ in. Unfortunately, the keymaps are a little weird.
 
 #+BEGIN_SRC emacs-lisp
   (use-package flyspell
-    :ensure)
+    :ensure
+    :diminish flyspell-mode)
 #+END_SRC
 
 *** Org mode                                                       :org_mode:
