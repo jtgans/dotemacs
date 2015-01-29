@@ -1,4 +1,4 @@
-;; Emacs initialization is handled in the init.org file.
+;; Emacs initialization is handled in the emacs-init.org file.
 
 (defconst jtg:org-init-filename (expand-file-name "emacs-init.org" user-emacs-directory)
   "The filename for the org-mode init file.")

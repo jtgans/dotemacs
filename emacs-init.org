@@ -95,10 +95,13 @@ That being said, I do want a decent font sometimes. The default fonts on any
 platform are just yuck. I prefer [[http://damieng.com/blog/2008/05/26/envy-code-r-preview-7-coding-font-released][Envy Code R preview #7 by DamienG]].
 
 #+BEGIN_SRC emacs-lisp
-  (case system-type
-    ('darwin (set-face-font 'default "Envy Code R")
-             (set-face-attribute 'default nil :height 141)
-             (set-face-attribute 'default nil :inherit nil)))
+    (case system-type
+      ('darwin (set-face-font 'default "Envy Code R")
+               (set-face-attribute 'default nil :height 141)
+               (set-face-attribute 'default nil :inherit nil))
+      ('gnu/linux (set-face-font 'default "Envy Code R")
+                  (set-face-attribute 'default nil :height 110)
+                  (set-face-attribute 'default nil :inherit nil)))
 #+END_SRC
 
 * Platform-specific fixes                                            :tweaks:
@@ -432,6 +435,19 @@ allows you to edit a list interactively.
     :ensure)
 #+END_SRC
 
+*** Browse URL                                                   :browse_url:
+
+=browse-url= has no proper integration for Google Chrome on Linux, and I have to
+force it to work by using =xdg-open= directly because I don't run GNOME.
+
+The reasoning here is [[gnus:nndoc%2Bephemeral:bug#18986#handler.18986.D18986.141546718528669.notifdone@debbugs.gnu.org][rather idiotic]] but whatever. I can force the issue by
+using =browse-url-generic-program= directly.
+
+#+BEGIN_SRC emacs-lisp
+  (setq browse-url-generic-program (executable-find "xdg-open")
+        browse-url-browser-function 'browse-url-generic)
+#+END_SRC
+
 *** Emacs web wowser                                                    :eww:
 
 This thing is crazy. Emacs finally has a web browser built
@@ -448,7 +464,8 @@ in. Unfortunately, the keymaps are a little weird.
 
 #+BEGIN_SRC emacs-lisp
   (use-package flyspell
-    :ensure)
+    :ensure
+    :diminish flyspell-mode)
 #+END_SRC
 
 *** Org mode                                                       :org_mode:
@@ -624,6 +641,16 @@ Really useful, lighter weight replacement to flymake.
     :ensure
     :init
     (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
+#+END_SRC
+
+*** Bug list for emacs                                              :debbugs:
+
+I'd like to try to become a better emacs citizen by fixing bugs and filing them,
+so I install debbugs to access the GNU buglist for emacs.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package debbugs
+    :ensure t)
 #+END_SRC
 
 *** Markdown editing mode                                          :markdown:
@@ -1024,6 +1051,17 @@ I like to type in Japanese, so let's tell MULE about that.
   (setq default-input-method "japanese-hiragana")
 #+END_SRC
 
+** GNUS article mode tweaks                                            :gnus:
+
+Article mode doesn't wrap text unless you call =gnus-article-fill-long-lines=.
+So I add this to the mode hook to ensure it's done every time.
+
+#+BEGIN_SRC emacs-lisp
+  (eval-after-load "gnus-art"
+    '(progn
+       (add-to-list 'gnus-article-mode-hook 'gnus-article-fill-long-lines)))
+#+END_SRC
+
 ** Misc settings
 
 #+BEGIN_SRC emacs-lisp
@@ -1177,6 +1215,17 @@ terminal. I've altered it to only use one key instead.
         (bind-keys :map term-raw-map
                ("C-c C-j" . jtg:toggle-term-mode)
                ("C-c C-k" . jtg:toggle-term-mode))))
+#+END_SRC
+
+Apparently yasnippet needs to be manually disabled in =ansi-term= because of
+some [[https://github.com/capitaomorte/yasnippet/issues/289][seriously weird behavior]] relating to how it handles keypresses.
+
+#+BEGIN_SRC emacs-lisp
+  (defun jtg:disable-yasnippet ()
+    "Disables yasnippet."
+    (yas-minor-mode -1))
+
+  (add-hook 'term-mode-hook 'jtg:disable-yasnippet)
 #+END_SRC
 
 ** Uniqueify buffer names
