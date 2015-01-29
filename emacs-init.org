@@ -1217,6 +1217,17 @@ terminal. I've altered it to only use one key instead.
                ("C-c C-k" . jtg:toggle-term-mode))))
 #+END_SRC
 
+Apparently yasnippet needs to be manually disabled in =ansi-term= because of
+some [[https://github.com/capitaomorte/yasnippet/issues/289][seriously weird behavior]] relating to how it handles keypresses.
+
+#+BEGIN_SRC emacs-lisp
+  (defun jtg:disable-yasnippet ()
+    "Disables yasnippet."
+    (yas-minor-mode -1))
+
+  (add-hook 'term-mode-hook 'jtg:disable-yasnippet)
+#+END_SRC
+
 ** Uniqueify buffer names
 
 #+BEGIN_SRC emacs-lisp
