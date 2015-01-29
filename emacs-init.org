@@ -933,15 +933,15 @@ Things that don't relate to packages or are generalized emacs settings go here.
 ** Stop Emacs from GCing the world
 
 Emacs will by default start GCing at 800KiB of garbage. This is really low once
-you start to have a bunch of add-on packages loaded. I bump mine to 10MB since
+you start to have a bunch of add-on packages loaded. I bump mine to 100MB since
 memory is relatively cheap on workstations.
 
 I also turn on garbage collection messages so I can see when things are going on
 in the background.
 
 #+BEGIN_SRC emacs-lisp
-  ;; Only GC when we hit a threshold of 10MB of RAM
-  (setq-default gc-cons-threshold 10000000)
+  ;; Only GC when we hit a threshold of 100MB of RAM
+  (setq-default gc-cons-threshold 100000000)
 
   ;; Enable garbage collection messages
   (setq garbage-collection-messages t)
