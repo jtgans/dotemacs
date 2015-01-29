@@ -643,6 +643,16 @@ Really useful, lighter weight replacement to flymake.
     (setq flycheck-display-errors-function #'flycheck-pos-tip-error-messages))
 #+END_SRC
 
+*** Bug list for emacs                                              :debbugs:
+
+I'd like to try to become a better emacs citizen by fixing bugs and filing them,
+so I install debbugs to access the GNU buglist for emacs.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package debbugs
+    :ensure t)
+#+END_SRC
+
 *** Markdown editing mode                                          :markdown:
 
 #+BEGIN_SRC emacs-lisp
@@ -1039,6 +1049,17 @@ I like to type in Japanese, so let's tell MULE about that.
 
 #+BEGIN_SRC emacs-lisp
   (setq default-input-method "japanese-hiragana")
+#+END_SRC
+
+** GNUS article mode tweaks                                            :gnus:
+
+Article mode doesn't wrap text unless you call =gnus-article-fill-long-lines=.
+So I add this to the mode hook to ensure it's done every time.
+
+#+BEGIN_SRC emacs-lisp
+  (eval-after-load "gnus-art"
+    '(progn
+       (add-to-list 'gnus-article-mode-hook 'gnus-article-fill-long-lines)))
 #+END_SRC
 
 ** Misc settings
