@@ -435,6 +435,19 @@ allows you to edit a list interactively.
     :ensure)
 #+END_SRC
 
+*** Browse URL                                                   :browse_url:
+
+=browse-url= has no proper integration for Google Chrome on Linux, and I have to
+force it to work by using =xdg-open= directly because I don't run GNOME.
+
+The reasoning here is [[gnus:nndoc%2Bephemeral:bug#18986#handler.18986.D18986.141546718528669.notifdone@debbugs.gnu.org][rather idiotic]] but whatever. I can force the issue by
+using =browse-url-generic-program= directly.
+
+#+BEGIN_SRC emacs-lisp
+  (setq browse-url-generic-program (executable-find "xdg-open")
+        browse-url-browser-function 'browse-url-generic)
+#+END_SRC
+
 *** Emacs web wowser                                                    :eww:
 
 This thing is crazy. Emacs finally has a web browser built
