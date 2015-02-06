@@ -95,13 +95,13 @@ That being said, I do want a decent font sometimes. The default fonts on any
 platform are just yuck. I prefer [[http://damieng.com/blog/2008/05/26/envy-code-r-preview-7-coding-font-released][Envy Code R preview #7 by DamienG]].
 
 #+BEGIN_SRC emacs-lisp
-    (case system-type
-      ('darwin (set-face-font 'default "Envy Code R")
-               (set-face-attribute 'default nil :height 141)
-               (set-face-attribute 'default nil :inherit nil))
-      ('gnu/linux (set-face-font 'default "Envy Code R")
-                  (set-face-attribute 'default nil :height 110)
-                  (set-face-attribute 'default nil :inherit nil)))
+  (case system-type
+    ('darwin (set-face-font 'default "Envy Code R")
+             (set-face-attribute 'default nil :height 141)
+             (set-face-attribute 'default nil :inherit nil))
+    ('gnu/linux (set-face-font 'default "Envy Code R")
+                (set-face-attribute 'default nil :height 110)
+                (set-face-attribute 'default nil :inherit nil)))
 #+END_SRC
 
 * Platform-specific fixes                                            :tweaks:
