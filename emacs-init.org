@@ -127,6 +127,14 @@ on MacOS X. This should help by stripping off the domain part.
 Various bits of elisp to help make existing in emacs a bit smoother.
 
 #+BEGIN_SRC emacs-lisp
+  (defun jtg:occur-word-at-point ()
+    "Function to grab the word at point and pass it to `occur'."
+    (interactive)
+    (let ((word (current-word t)))
+      (if (stringp word)
+          (occur (current-word t))
+        (message "No word at point."))))
+
   (defun jtg:jump-to-or-start-term (ch)
     "Function to force the current window to switch to or restart the given term
   character."
@@ -942,7 +950,8 @@ had my own custom prefix key, anyway.
              ("e" . eww)
              ("g" . magit-status)
              ("I" . find-init-file)
-             ("R" . reload-init-file))
+             ("R" . reload-init-file)
+             ("o" . jtg:occur-word-at-point))
 #+END_SRC
 
 ** =ansi-term= multi instance keymap
