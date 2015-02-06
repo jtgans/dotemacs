@@ -752,10 +752,11 @@ just like how git does.
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
     :ensure
-    :diminish projectile-mode
     :init
     (require 'projectile)
-    (projectile-global-mode))
+    (projectile-global-mode)
+    :config
+    (setq projectile-mode-line '(:eval (format " <%s>" (projectile-project-name)))))
 #+END_SRC
 
 *** Code snippet template insertions                              :yasnippet:
