@@ -95,13 +95,13 @@ That being said, I do want a decent font sometimes. The default fonts on any
 platform are just yuck. I prefer [[http://damieng.com/blog/2008/05/26/envy-code-r-preview-7-coding-font-released][Envy Code R preview #7 by DamienG]].
 
 #+BEGIN_SRC emacs-lisp
-    (case system-type
-      ('darwin (set-face-font 'default "Envy Code R")
-               (set-face-attribute 'default nil :height 141)
-               (set-face-attribute 'default nil :inherit nil))
-      ('gnu/linux (set-face-font 'default "Envy Code R")
-                  (set-face-attribute 'default nil :height 110)
-                  (set-face-attribute 'default nil :inherit nil)))
+  (case system-type
+    ('darwin (set-face-font 'default "Envy Code R")
+             (set-face-attribute 'default nil :height 141)
+             (set-face-attribute 'default nil :inherit nil))
+    ('gnu/linux (set-face-font 'default "Envy Code R")
+                (set-face-attribute 'default nil :height 110)
+                (set-face-attribute 'default nil :inherit nil)))
 #+END_SRC
 
 * Platform-specific fixes                                            :tweaks:
@@ -127,6 +127,14 @@ on MacOS X. This should help by stripping off the domain part.
 Various bits of elisp to help make existing in emacs a bit smoother.
 
 #+BEGIN_SRC emacs-lisp
+  (defun jtg:occur-word-at-point ()
+    "Function to grab the word at point and pass it to `occur'."
+    (interactive)
+    (let ((word (current-word t)))
+      (if (stringp word)
+          (occur (current-word t))
+        (message "No word at point."))))
+
   (defun jtg:jump-to-or-start-term (ch)
     "Function to force the current window to switch to or restart the given term
   character."
@@ -755,10 +763,11 @@ just like how git does.
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
     :ensure
-    :diminish projectile-mode
     :init
     (require 'projectile)
-    (projectile-global-mode))
+    (projectile-global-mode)
+    :config
+    (setq projectile-mode-line '(:eval (format " <%s>" (projectile-project-name)))))
 #+END_SRC
 
 *** Code snippet template insertions                              :yasnippet:
@@ -802,6 +811,9 @@ QuickSilver on the Mac to make things very simple.
           helm-input-idle-delay 0.01
           helm-quick-update t
           helm-ff-skip-boring-files t)
+
+    (add-to-list 'helm-boring-file-regexp-list "/\\.#.*$")
+    (add-to-list 'helm-boring-file-regexp-list "/\\..*")
 
     (helm-mode 1))
 #+END_SRC
@@ -944,7 +956,8 @@ had my own custom prefix key, anyway.
              ("e" . eww)
              ("g" . magit-status)
              ("I" . find-init-file)
-             ("R" . reload-init-file))
+             ("R" . reload-init-file)
+             ("o" . jtg:occur-word-at-point))
 #+END_SRC
 
 ** =ansi-term= multi instance keymap
@@ -1187,6 +1200,18 @@ I prefer the Google C style when possible.
        (add-hook 'c-mode-common-hook #'fci-mode)
        (add-hook 'c-mode-common-hook #'linum-mode)
        (add-hook 'c-mode-common-hook #'auto-fill-mode)))
+#+END_SRC
+
+** Java programming                                               :java_mode:
+
+Settings that are generally used for Java specific modes.
+
+#+BEGIN_SRC emacs-lisp
+  (defun jtg:set-fci-column-to-100 ()
+    "Sets the FCI column to 100."
+    (setq-local fci-rule-column 100))
+
+  (add-hook 'java-mode-hook 'jtg:set-fci-column-to-100)
 #+END_SRC
 
 ** Generalized Programming Settings                                :progmode:
