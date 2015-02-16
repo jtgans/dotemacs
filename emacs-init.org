@@ -1095,6 +1095,7 @@ So I add this to the mode hook to ensure it's done every time.
         inhibit-splash-screen t
         visible-bell 1
         blink-cursor-blinks -1
+        display-time-day-and-date t
         )
 
   (display-time)
