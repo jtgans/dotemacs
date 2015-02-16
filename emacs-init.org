@@ -453,8 +453,9 @@ The reasoning here is [[gnus:nndoc%2Bephemeral:bug#18986#handler.18986.D18986.14
 using =browse-url-generic-program= directly.
 
 #+BEGIN_SRC emacs-lisp
-  (setq browse-url-generic-program (executable-find "xdg-open")
-        browse-url-browser-function 'browse-url-generic)
+  (if (eq system-type 'linux)
+    (setq browse-url-generic-program (executable-find "xdg-open")
+          browse-url-browser-function 'browse-url-generic))
 #+END_SRC
 
 *** Emacs web wowser                                                    :eww:
