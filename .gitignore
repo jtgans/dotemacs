@@ -11,3 +11,5 @@ savehist
 /url/
 /projectile.cache
 /.#ede-projects.el
+/bookmarks
+/tramp

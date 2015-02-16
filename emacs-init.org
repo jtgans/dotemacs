@@ -385,6 +385,7 @@ instead to check if it's available and install it directly if not.
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :ensure
+    :diminish nil
     :init
     (require 'magit)
     (magit-auto-revert-mode t)
@@ -546,15 +547,15 @@ folks.
   (defvar jtg:current-one-on-one nil
     "The name of the org file used for notes for the current 1:1.")
 
-  (defun jtg:capture-one-on-one ()
+  (defun jtg:capture-one-on-one (who)
     "Sets up a capture for a 1:1 meeting with a given person."
     (interactive "sWho: ")
     (setq current-one-on-one (concat org-directory "/1:1/" who ".org"))
     (org-capture nil "1"))
 
   (use-package org-capture
-    :bind (("C-c c" . org-capture)
-           ("C-c C" . jtg:capture-one-on-one))
+    :bind (("C-c C-j c" . org-capture)
+           ("C-c C-j 1" . jtg:capture-one-on-one))
     :init
     (setq org-capture-templates '(("t" "Todo" entry (file+headline "~/Notebook/org/agenda.org" "Unfiled Tasks") "* TODO %?\n%a\n%x\n")
                                   ("n" "Note" entry (file+datetree "~/Notebook/org/notes.org" "* %u %?"))
@@ -638,12 +639,14 @@ Really useful, lighter weight replacement to flymake.
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
     :ensure
-    :diminish flycheck-mode
+    :diminish "Ch"
     :init (require 'flycheck)
     :bind (("M-n" . flycheck-next-error)
            ("M-p" . flycheck-previous-error))
     :config
-    (setq flycheck-checkers (--remove (eq it 'emacs-lisp-checkdoc) flycheck-checkers))
+    (setq flycheck-checkers (--remove (eq it 'emacs-lisp-checkdoc) flycheck-checkers)
+          flycheck-clang-language-standard "c++11"
+          flycheck-gcc-language-standard "c++11")
     (global-flycheck-mode))
 
   (use-package flycheck-pos-tip
@@ -1150,6 +1153,21 @@ editing themes more often now.
 #+BEGIN_SRC emacs-lisp
   (add-hook 'emacs-lisp-mode-hook #'prettify-symbols-mode)
   (add-hook 'emacs-lisp-mode-hook #'hexcolor-add-to-font-lock)
+#+END_SRC
+
+** Java programming                                               :java_mode:
+
+*** Java style
+
+Unfortunately, emacs' java mode is pretty broken when it comes to indentation in
+places. So I have to fix it here.
+
+#+BEGIN_SRC emacs-lisp
+  (defun jtg:fix-java-style-hook ()
+    "Hook to fix the indentation in `java-mode'."
+    (c-set-offset 'arglist-cont-nonempty '++))
+
+  (add-hook 'java-mode-hook 'jtg:fix-java-style-hook)
 #+END_SRC
 
 ** C/C++ programming                                                 :c_mode:
