@@ -556,7 +556,7 @@ folks.
     :bind (("C-c c" . org-capture)
            ("C-c C" . jtg:capture-one-on-one))
     :init
-    (setq org-capture-templates '(("t" "Todo" entry (file+headline "~/Notebook/org/agenda.org" "Unfiled Tasks"))
+    (setq org-capture-templates '(("t" "Todo" entry (file+headline "~/Notebook/org/agenda.org" "Unfiled Tasks") "* TODO %?\n%a\n%x\n")
                                   ("n" "Note" entry (file+datetree "~/Notebook/org/notes.org" "* %u %?"))
                                   ("1" "1:1 Note" entry (file+datetree current-one-on-one "* [%<%d-%b-%Y %H:%M>] %?\n%i\n")))))
 #+END_SRC
