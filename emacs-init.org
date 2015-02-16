@@ -817,7 +817,8 @@ QuickSilver on the Mac to make things very simple.
 
     :config
     (add-to-list 'helm-boring-file-regexp-list "/\\.#.*$")
-    (add-to-list 'helm-boring-file-regexp-list "/\\..*"))
+    (add-to-list 'helm-boring-file-regexp-list "/\\.$")
+    (add-to-list 'helm-boring-file-regexp-list "/\\.\\.$"))
 #+END_SRC
 
 **** helm-projectile
