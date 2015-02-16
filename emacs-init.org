@@ -377,6 +377,7 @@ instead to check if it's available and install it directly if not.
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :ensure
+    :diminish nil
     :init
     (require 'magit)
     (magit-auto-revert-mode t)
