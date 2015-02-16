@@ -1217,16 +1217,30 @@ I prefer the Google C style when possible.
        (add-hook 'c-mode-common-hook #'auto-fill-mode)))
 #+END_SRC
 
-** Java programming                                               :java_mode:
+** Common lisp programming                                             :lisp:
 
-Settings that are generally used for Java specific modes.
+*** SLIME Integration
+
+So hacking in a lisp terminal is fun, and working on raw lisp files is good and
+all, but it's really handy to have an inferior common lisp interpreter at hand.
+I personally use SBCL since it's the fastest and better supported than other
+lisps.
+
+Steps to setup the SLIME helper for SBCL:
+  - Install SBCL somewhere.
+  - Download [[http://beta.quicklisp.org/quicklisp.lisp][quicklisp]] and stick it somewhere.
+  - Start SBCL and run =(quicklisp-quickstart:install)= to install it.
+  - Then run =(ql:add-to-init-file)= to always load it from .sbclrc.
+  - Finally =(ql:quickload "quicklisp-slime-helper")= to load in the SLIME
+    helper for SBCL.
+  - Restart emacs.
 
 #+BEGIN_SRC emacs-lisp
-  (defun jtg:set-fci-column-to-100 ()
-    "Sets the FCI column to 100."
-    (setq-local fci-rule-column 100))
+  (load (expand-file-name "~/quicklisp/slime-helper.el") t)
 
-  (add-hook 'java-mode-hook 'jtg:set-fci-column-to-100)
+  (if (boundp 'inferior-lisp-program)
+      ;; Replace "sbcl" with the path to your implementation
+      (setq inferior-lisp-program "sbcl"))
 #+END_SRC
 
 ** Generalized Programming Settings                                :progmode:
