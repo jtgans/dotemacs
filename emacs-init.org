@@ -1171,6 +1171,17 @@ places. So I have to fix it here.
   (add-hook 'java-mode-hook 'jtg:fix-java-style-hook)
 #+END_SRC
 
+Set Java's FCI column to 100 since 80 is just too short for Java's verbose
+syntax.
+
+#+BEGIN_SRC emacs-lisp
+  (defun jtg:set-fci-column-to-100 ()
+    "Sets the FCI column to 100."
+    (setq-local fci-rule-column 100))
+
+  (add-hook 'java-mode-hook 'jtg:set-fci-column-to-100)
+#+END_SRC
+
 ** C/C++ programming                                                 :c_mode:
 
 *** C style
