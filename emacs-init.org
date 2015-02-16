@@ -538,15 +538,15 @@ folks.
   (defvar jtg:current-one-on-one nil
     "The name of the org file used for notes for the current 1:1.")
 
-  (defun jtg:capture-one-on-one ()
+  (defun jtg:capture-one-on-one (who)
     "Sets up a capture for a 1:1 meeting with a given person."
     (interactive "sWho: ")
     (setq current-one-on-one (concat org-directory "/1:1/" who ".org"))
     (org-capture nil "1"))
 
   (use-package org-capture
-    :bind (("C-c c" . org-capture)
-           ("C-c C" . jtg:capture-one-on-one))
+    :bind (("C-c C-j c" . org-capture)
+           ("C-c C-j 1" . jtg:capture-one-on-one))
     :init
     (setq org-capture-templates '(("t" "Todo" entry (file+headline "~/Notebook/org/agenda.org" "Unfiled Tasks"))
                                   ("n" "Note" entry (file+datetree "~/Notebook/org/notes.org" "* %u %?"))
