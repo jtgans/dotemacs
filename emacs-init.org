@@ -810,10 +810,11 @@ QuickSilver on the Mac to make things very simple.
           helm-quick-update t
           helm-ff-skip-boring-files t)
 
-    (add-to-list 'helm-boring-file-regexp-list "/\\.#.*$")
-    (add-to-list 'helm-boring-file-regexp-list "/\\..*")
+    (helm-mode 1)
 
-    (helm-mode 1))
+    :config
+    (add-to-list 'helm-boring-file-regexp-list "/\\.#.*$")
+    (add-to-list 'helm-boring-file-regexp-list "/\\..*"))
 #+END_SRC
 
 **** helm-projectile
