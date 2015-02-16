@@ -1139,6 +1139,21 @@ editing themes more often now.
   (add-hook 'emacs-lisp-mode-hook #'hexcolor-add-to-font-lock)
 #+END_SRC
 
+** Java programming                                               :java_mode:
+
+*** Java style
+
+Unfortunately, emacs' java mode is pretty broken when it comes to indentation in
+places. So I have to fix it here.
+
+#+BEGIN_SRC emacs-lisp
+  (defun jtg:fix-java-style-hook ()
+    "Hook to fix the indentation in `java-mode'."
+    (c-set-offset 'arglist-cont-nonempty '++))
+
+  (add-hook 'java-mode-hook 'jtg:fix-java-style-hook)
+#+END_SRC
+
 ** C/C++ programming                                                 :c_mode:
 
 *** C style
