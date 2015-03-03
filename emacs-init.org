@@ -650,9 +650,9 @@ Really useful, lighter weight replacement to flymake.
     :bind (("M-n" . flycheck-next-error)
            ("M-p" . flycheck-previous-error))
     :config
-    (setq flycheck-checkers (--remove (eq it 'emacs-lisp-checkdoc) flycheck-checkers)
-          flycheck-clang-language-standard "c++11"
-          flycheck-gcc-language-standard "c++11")
+    (setq-default flycheck-checkers (--remove (eq it 'emacs-lisp-checkdoc) flycheck-checkers)
+                  flycheck-clang-language-standard "c++11"
+                  flycheck-gcc-language-standard "c++11")
     (global-flycheck-mode))
 
   (use-package flycheck-pos-tip
