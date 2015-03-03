@@ -123,7 +123,9 @@ on MacOS X. This should help by stripping off the domain part.
   ;; Fix broken keyboard mappings
   (if (or (eq system-type 'darwin)
           (eq system-type 'berkeley-unix))
-      (setq mac-command-key-is-meta t))
+      (setq mac-command-key-is-meta t
+            mac-command-modifier 'meta
+            mac-option-modifier 'alt))
 #+END_SRC
 
 * Defuns                                                              :elisp:
