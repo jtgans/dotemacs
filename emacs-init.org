@@ -119,6 +119,11 @@ on MacOS X. This should help by stripping off the domain part.
   (if (or (eq system-type 'darwin)
           (eq system-type 'berkeley-unix))
       (setq system-name (car (split-string system-name "\\."))))
+
+  ;; Fix broken keyboard mappings
+  (if (or (eq system-type 'darwin)
+          (eq system-type 'berkeley-unix))
+      (setq mac-command-key-is-meta t))
 #+END_SRC
 
 * Defuns                                                              :elisp:
