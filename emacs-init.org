@@ -126,6 +126,20 @@ on MacOS X. This should help by stripping off the domain part.
       (setq mac-command-key-is-meta t
             mac-command-modifier 'meta
             mac-option-modifier 'alt))
+
+  (defun fix-path-hook ()
+    "Fixes the fucking stupidly broken PATH on Mac OS X."
+    (setenv "PATH"
+            (with-temp-buffer
+              (call-process "/bin/bash"
+                            nil
+                            (list (current-buffer) nil)
+                            nil
+                            "-l" "-c" "printf %s \"$PATH\"")
+              (buffer-string))))
+
+  (if (or (eq system-type 'darwin))
+      (add-hook 'after-init-hook #'fix-path-hook))
 #+END_SRC
 
 * Defuns                                                              :elisp:
