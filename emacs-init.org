@@ -1265,7 +1265,27 @@ Steps to setup the SLIME helper for SBCL:
                  (eq system-type 'berkeley-unix)))
             (setq inferior-lisp-program "/usr/local/bin/sbcl")
             (t (setq inferior-lisp-program "/usr/bin/sbcl"))))
+#+END_SRC
 
+**** Keybinding breakages
+
+#+BEGIN_SRC emacs-lisp
+  ;; Remove SLIME's C-c C-j hook since I'm not interested in evaluating a last
+  ;; expression, and it shadows my global def for my keymap.
+  (defun jtg:remove-slime-eval-last-expr ()
+    "Removes SLIME's C-c C-j key binding in deference to my own."
+    (define-key slime-mode-map "C-c C-j" nil))
+
+  (add-hook 'slime-mode-hook 'jtg:remove-slime-eval-last-expr)
+#+END_SRC
+
+**** Log4SLIME
+
+#+BEGIN_SRC emacs-lisp
+  ;; Log4cl Log4SLIME integration
+  (if (load (expand-file-name "~/quicklisp/log4slime-setup.el") t)
+      (global-log4slime-mode 1)
+    (message "Log4SLIME not loaded -- L4S will not be available."))
 #+END_SRC
 
 *** Common lisp hyperspec
