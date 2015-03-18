@@ -452,7 +452,7 @@ larger chunks.
 #+BEGIN_SRC emacs-lisp
   (use-package expand-region
     :ensure
-    :bind (("M-C-SPC" . er/expand-region)))
+    :bind (("M-S-SPC" . er/expand-region)))
 #+END_SRC
 
 *** Edit an existing elisp form interactively                     :edit_list:
