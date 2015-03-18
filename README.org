@@ -1,0 +1,7 @@
+* Emacs Init Files
+
+To make use of these files, do this in a recent emacs:
+
+  - =$ git clone https://github.com/jtgans/dotemacs.git ~/.emacs.d=
+  - Start emacs.
+  - Hack away.
