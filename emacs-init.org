@@ -128,15 +128,19 @@ on MacOS X. This should help by stripping off the domain part.
             mac-option-modifier 'alt))
 
   (defun fix-path-hook ()
-    "Fixes the fucking stupidly broken PATH on Mac OS X."
-    (setenv "PATH"
-            (with-temp-buffer
-              (call-process "/bin/bash"
-                            nil
-                            (list (current-buffer) nil)
-                            nil
-                            "-l" "-c" "printf %s \"$PATH\"")
-              (buffer-string))))
+    "Fixes the fucking stupidly broken PATH and `exec-path' on Mac
+  OS X."
+    (let ((new-path
+           (with-temp-buffer
+             (call-process "/bin/bash"
+                           nil
+                           (list (current-buffer) nil)
+                           nil
+                           "-l" "-c" "printf %s \"$PATH\"")
+             (buffer-string))))
+      (setenv "PATH" new-path)
+      (setq exec-path (split-string new-path ":")))
+    (values))
 
   (if (or (eq system-type 'darwin))
       (add-hook 'after-init-hook #'fix-path-hook))
