@@ -904,7 +904,8 @@ QuickSilver on the Mac to make things very simple.
           rcirc-default-nick "texel"
           rcirc-default-user-name "texel"
           rcirc-default-user-full-name "June Tate-Gans"
-          rcirc-authinfo `("freenode" nickserv "texel" ,(rcirc-get-nick-pass "irc.freenode.net" "texel"))
+          rcirc-authinfo `(("freenode" nickserv "texel" ,(rcirc-get-nick-pass "irc.freenode.net" "texel")))
+          rcirc-server-alist '(("irc.freenode.net" :channels ("#emacs")))
           rcirc-buffer-maximum-lines 10000
           rcirc-kill-channel-buffers t)
           
