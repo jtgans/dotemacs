@@ -1236,8 +1236,6 @@ I prefer the Google C style when possible.
        (c-set-offset 'access-label '-2)
        (c-set-offset 'innamespace '0)
 
-       (add-hook 'c-mode-common-hook #'fci-mode)
-       (add-hook 'c-mode-common-hook #'linum-mode)
        (add-hook 'c-mode-common-hook #'auto-fill-mode)))
 #+END_SRC
 
