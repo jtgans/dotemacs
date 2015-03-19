@@ -410,7 +410,6 @@ instead to check if it's available and install it directly if not.
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :ensure
-    :diminish nil
     :init
     (require 'magit)
     (magit-auto-revert-mode t)
@@ -802,7 +801,6 @@ just like how git does.
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
     :ensure
-    :diminish yasnippet-mode
     :commands yas-global-mode
     :init
     (add-hook 'hippie-expand-try-functions-list #'yas-hippie-try-expand)
