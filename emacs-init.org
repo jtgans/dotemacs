@@ -330,31 +330,6 @@ Borrowed from [[http://whattheemacsd.com/setup-magit.el-01.html][whattheemacsd.c
     (jump-to-register :magit-fullscreen))
 #+END_SRC
 
-*** Make rcirc dynamically fill                                       :rcirc:
-
-This code is borrowed from [[http://www.emacswiki.org/emacs/rcircAutoFillColumn]].
-
-Effectively this allows rcirc to re-wrap IRC lines that don't fit dynamically.
-It's not a perfect solution since prior lines won't be updated, but it's good
-enough.
-
-#+BEGIN_SRC emacs-lisp
-  (defvar dim:dynamic-fill-column-margin 3
-    "Safety margin used to calculate fill-column depending on window-width")
-
-  (defun dim:dynamic-fill-column-window (window &optional margin)
-    "Dynamically get window's width and adjust fill-column accordingly"
-    (with-current-buffer (window-buffer window)
-      (when (eq major-mode 'rcirc-mode)
-        (setq fill-column
-              (- (window-width window) 
-                 (or margin dim:dynamic-fill-column-margin))))))
-
-  (defun dim:dynamic-fill-column (frame)
-    "Dynamically tune fill-column for a frame's windows at redisplay time"
-    (walk-windows 'dim:dynamic-fill-column-window 'no-minibuf frame))
-#+END_SRC
-
 * Add-on Packages
 
 I use John Wiegley's [[https://github.com/jwiegley/use-package][=use-package=]] to help config/install packages that may or
@@ -908,11 +883,10 @@ QuickSilver on the Mac to make things very simple.
           rcirc-server-alist '(("irc.freenode.net" :channels ("#emacs")))
           rcirc-buffer-maximum-lines 10000
           rcirc-kill-channel-buffers t)
-          
 
     (set-face-foreground 'rcirc-my-nick "yellow" nil)
-    (add-to-list 'window-size-change-functions 'dim:dynamic-fill-column)
     (add-hook 'rcirc-mode-hook #'flyspell-mode)
+    (add-hook 'rcirc-mode-hook #'visual-line-mode)
     (rcirc-track-minor-mode))
 #+END_SRC
 
