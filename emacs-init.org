@@ -1106,6 +1106,22 @@ So I add this to the mode hook to ensure it's done every time.
        (add-to-list 'gnus-article-mode-hook 'gnus-article-fill-long-lines)))
 #+END_SRC
 
+** View-mode adjustments
+
+View mode doesn't provide for wrapping long lines, which is annoying. I'd like
+to ensure that it does so, so I provide a hook for this.
+
+#+BEGIN_SRC emacs-lisp
+  (defun jtg:wrap-lines-hook ()
+    "Wraps long lines by setting truncate-lines to nil and enabling visual line
+  mode (if available)"
+    (setq truncate-lines nil
+          word-wrap t)
+    (visual-line-mode))
+
+  (add-hook 'view-mode-hook #'jtg:wrap-lines-hook)
+#+END_SRC
+
 ** Misc settings
 
 #+BEGIN_SRC emacs-lisp
