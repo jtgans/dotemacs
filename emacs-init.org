@@ -916,7 +916,9 @@ or where remapping them is intractable (such as grave/hyper).
              ("M-'"   . insert-pair)
              ("M-["   . insert-pair)
              ("M-{"   . insert-pair)
+
              ("C-c C-'" . (lambda () (interactive) (insert "`")))
+             ("C-c \"" . (lambda () (interactive) (insert "~")))
 
              ("C-c q" . auto-fill-mode)
 
