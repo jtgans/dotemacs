@@ -1225,9 +1225,11 @@ I prefer the Google C style when possible.
        (setq-default c-indent-level 4
                      c-basic-offset 4
                      c-syntactic-indentation t)
+       (c-set-offset 'inclass '++)
+       (c-set-offset 'access-label '-)
        (c-set-offset 'case-label '+)
-       (c-set-offset 'access-label '-2)
        (c-set-offset 'innamespace '0)
+       (c-set-offset 'inextern-lang '0)
 
        (add-hook 'c-mode-common-hook #'auto-fill-mode)))
 #+END_SRC
