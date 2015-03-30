@@ -10,7 +10,7 @@
  '(cursor ((t (:background "#fce94f"))))
  '(border ((t (:foreground "#ffffff"))))
  '(region ((t (:background "#6c91be"))))
- '(fringe ((t (:background "#3f464c"))))
+ '(fringe ((t (:background "#2b2b2b"))))
  '(header-line ((t (:foreground "#f0dfaf" :background "#2b2b2b"))))
  '(highlight ((((min-colors 300)) (:background "#2b2b2b"))
               (t (:background "#000000"))))
