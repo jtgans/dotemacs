@@ -1257,8 +1257,8 @@ Steps to setup the SLIME helper for SBCL:
 
   (if (boundp 'inferior-lisp-program)
       (cond ((or (eq system-type 'darwin)
-                 (eq system-type 'berkeley-unix)))
-            (setq inferior-lisp-program "/usr/local/bin/sbcl")
+                 (eq system-type 'berkeley-unix))
+             (setq inferior-lisp-program "/usr/local/bin/sbcl"))
             (t (setq inferior-lisp-program "/usr/bin/sbcl"))))
 #+END_SRC
 
