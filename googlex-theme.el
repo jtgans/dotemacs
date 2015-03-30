@@ -94,8 +94,12 @@
  ;; Term
  '(term-color-blue ((t (:foreground "DeepSkyBlue" :background "DeepSkyBlue"))))
  '(term-color-magenta ((t (:foreground "magenta" :background "magenta"))))
+
+ ;; rcirc
+ '(rcirc-track-nick ((t (:inherit error :inverse-video t))))
+ '(rcirc-track-keyword ((t (:inherit error :inverse-video t))))
 )
- 
+
 ;;;###autoload
 (and load-file-name
      (boundp 'custom-theme-load-path)
