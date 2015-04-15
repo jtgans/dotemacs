@@ -1243,6 +1243,10 @@ I prefer the Google C style when possible.
        (c-set-offset 'case-label '+)
        (c-set-offset 'innamespace '0)
        (c-set-offset 'inextern-lang '0)
+       (c-set-offset 'inclass '++)
+
+       (bind-key "C-c o" #'ff-find-other-file c-mode-map)
+       (bind-key "C-c o" #'ff-find-other-file c++-mode-map)
 
        (add-hook 'c-mode-common-hook #'auto-fill-mode)))
 #+END_SRC
