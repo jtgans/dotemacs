@@ -1251,6 +1251,15 @@ I prefer the Google C style when possible.
        (add-hook 'c-mode-common-hook #'auto-fill-mode)))
 #+END_SRC
 
+*** Objective-C
+
+Add objc-mode support for objc++ files since there's no actual mode for it, and
+objc-mode comes close.
+
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'auto-mode-alist '("\\.mm\\'" . objc-mode))
+#+END_SRC
+
 ** Common lisp programming                                             :lisp:
 
 *** SLIME Integration
