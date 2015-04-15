@@ -537,7 +537,11 @@ Go read [[http://orgmode.org/manual/][the manual]]!
           org-src-fontify-natively t
           org-src-window-setup 'current-window
           org-src-lang-modes '(("elisp" . emacs-lisp)
-                               ("dot"   . fundamental)))
+                               ("dot"   . fundamental))
+
+          org-todo-keywords '((sequence "TODO" "STARTED(!)" "WAITING(@)"
+                                        "DELEGATED(@)" "|" "DONE(!@)"
+                                        "DEFERRED(!@)" "CANCELLED(!@)")))
     :config
     (add-hook 'org-mode-hook #'auto-fill-mode)
     (add-hook 'org-mode-hook #'flyspell-mode)
