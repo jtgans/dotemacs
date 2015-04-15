@@ -503,6 +503,14 @@ Go read [[http://orgmode.org/manual/][the manual]]!
           org-reverse-note-order t
           org-return-follows-link t
 
+          org-src-fontify-natively t
+          org-src-lang-modes '(("elisp" . emacs-lisp)
+                               ("ditaa" . artist)
+                               ("dot"   . fundamental)
+                               ("calc"  . fundamental))
+
+          org-startup-folded 'content
+
           org-structure-template-alist '(("s" "#+BEGIN_SRC ?\n\n#+END_SRC" "<src lang=\"?\">\n\n</src>")
                                          ("ex" "#+BEGIN_EXAMPLE\n?\n#+END_EXAMPLE" "<example>\n?\n</example>")
                                          ("q" "#+BEGIN_QUOTE\n?\n#+END_QUOTE" "<quote>\n?\n</quote>")
