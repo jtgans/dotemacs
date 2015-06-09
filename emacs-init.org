@@ -991,7 +991,7 @@ I find it really handy to have multiple =ansi-term= sessions running at once in
 emacs -- especially when it's daemonized.
 
 #+BEGIN_SRC emacs-lisp
-  (bind-key "C-c t" #'jtg:jump-to-or-start-term)
+  (bind-key (kbd "C-c t") #'jtg:jump-to-or-start-term)
 #+END_SRC
 
 * General Emacs Tweaks                                               :tweaks:
