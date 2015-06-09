@@ -828,9 +828,7 @@ QuickSilver on the Mac to make things very simple.
     (helm-mode 1)
 
     :config
-    (add-to-list 'helm-boring-file-regexp-list "/\\.#.*$")
-    (add-to-list 'helm-boring-file-regexp-list "/\\.$")
-    (add-to-list 'helm-boring-file-regexp-list "/\\.\\.$"))
+    (add-to-list 'helm-boring-file-regexp-list "/\\.#.*$"))
 #+END_SRC
 
 **** helm-projectile
