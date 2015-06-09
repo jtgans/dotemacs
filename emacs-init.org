@@ -128,15 +128,19 @@ on MacOS X. This should help by stripping off the domain part.
             mac-option-modifier 'alt))
 
   (defun fix-path-hook ()
-    "Fixes the fucking stupidly broken PATH on Mac OS X."
-    (setenv "PATH"
-            (with-temp-buffer
-              (call-process "/bin/bash"
-                            nil
-                            (list (current-buffer) nil)
-                            nil
-                            "-l" "-c" "printf %s \"$PATH\"")
-              (buffer-string))))
+    "Fixes the fucking stupidly broken PATH and `exec-path' on Mac
+  OS X."
+    (let ((new-path
+           (with-temp-buffer
+             (call-process "/bin/bash"
+                           nil
+                           (list (current-buffer) nil)
+                           nil
+                           "-l" "-c" "printf %s \"$PATH\"")
+             (buffer-string))))
+      (setenv "PATH" new-path)
+      (setq exec-path (split-string new-path ":")))
+    (values))
 
   (if (or (eq system-type 'darwin))
       (add-hook 'after-init-hook #'fix-path-hook))
@@ -326,31 +330,6 @@ Borrowed from [[http://whattheemacsd.com/setup-magit.el-01.html][whattheemacsd.c
     (jump-to-register :magit-fullscreen))
 #+END_SRC
 
-*** Make rcirc dynamically fill                                       :rcirc:
-
-This code is borrowed from [[http://www.emacswiki.org/emacs/rcircAutoFillColumn]].
-
-Effectively this allows rcirc to re-wrap IRC lines that don't fit dynamically.
-It's not a perfect solution since prior lines won't be updated, but it's good
-enough.
-
-#+BEGIN_SRC emacs-lisp
-  (defvar dim:dynamic-fill-column-margin 3
-    "Safety margin used to calculate fill-column depending on window-width")
-
-  (defun dim:dynamic-fill-column-window (window &optional margin)
-    "Dynamically get window's width and adjust fill-column accordingly"
-    (with-current-buffer (window-buffer window)
-      (when (eq major-mode 'rcirc-mode)
-        (setq fill-column
-              (- (window-width window) 
-                 (or margin dim:dynamic-fill-column-margin))))))
-
-  (defun dim:dynamic-fill-column (frame)
-    "Dynamically tune fill-column for a frame's windows at redisplay time"
-    (walk-windows 'dim:dynamic-fill-column-window 'no-minibuf frame))
-#+END_SRC
-
 * Add-on Packages
 
 I use John Wiegley's [[https://github.com/jwiegley/use-package][=use-package=]] to help config/install packages that may or
@@ -406,7 +385,6 @@ instead to check if it's available and install it directly if not.
 #+BEGIN_SRC emacs-lisp
   (use-package magit
     :ensure
-    :diminish nil
     :init
     (require 'magit)
     (magit-auto-revert-mode t)
@@ -525,6 +503,14 @@ Go read [[http://orgmode.org/manual/][the manual]]!
           org-reverse-note-order t
           org-return-follows-link t
 
+          org-src-fontify-natively t
+          org-src-lang-modes '(("elisp" . emacs-lisp)
+                               ("ditaa" . artist)
+                               ("dot"   . fundamental)
+                               ("calc"  . fundamental))
+
+          org-startup-folded 'content
+
           org-structure-template-alist '(("s" "#+BEGIN_SRC ?\n\n#+END_SRC" "<src lang=\"?\">\n\n</src>")
                                          ("ex" "#+BEGIN_EXAMPLE\n?\n#+END_EXAMPLE" "<example>\n?\n</example>")
                                          ("q" "#+BEGIN_QUOTE\n?\n#+END_QUOTE" "<quote>\n?\n</quote>")
@@ -551,7 +537,11 @@ Go read [[http://orgmode.org/manual/][the manual]]!
           org-src-fontify-natively t
           org-src-window-setup 'current-window
           org-src-lang-modes '(("elisp" . emacs-lisp)
-                               ("dot"   . fundamental)))
+                               ("dot"   . fundamental))
+
+          org-todo-keywords '((sequence "TODO" "STARTED(!)" "WAITING(@)"
+                                        "DELEGATED(@)" "|" "DONE(!@)"
+                                        "DEFERRED(!@)" "CANCELLED(!@)")))
     :config
     (add-hook 'org-mode-hook #'auto-fill-mode)
     (add-hook 'org-mode-hook #'flyspell-mode)
@@ -592,6 +582,7 @@ folks.
     :init
     (setq org-agenda-files '("~/Notebook/org/agenda.org")
           org-agenda-resore-windows-after-quit t
+          org-deadline-warning-days 14
           org-agenda-skip-deadline-if-done t
           org-agenda-skip-scheduled-if-done t
           org-agenda-start-on-weekday nil
@@ -798,7 +789,6 @@ just like how git does.
 #+BEGIN_SRC emacs-lisp
   (use-package yasnippet
     :ensure
-    :diminish yasnippet-mode
     :commands yas-global-mode
     :init
     (add-hook 'hippie-expand-try-functions-list #'yas-hippie-try-expand)
@@ -902,14 +892,14 @@ QuickSilver on the Mac to make things very simple.
           rcirc-default-nick "texel"
           rcirc-default-user-name "texel"
           rcirc-default-user-full-name "June Tate-Gans"
-          rcirc-authinfo `("freenode" nickserv "texel" ,(rcirc-get-nick-pass "irc.freenode.net" "texel"))
+          rcirc-authinfo `(("freenode" nickserv "texel" ,(rcirc-get-nick-pass "irc.freenode.net" "texel")))
+          rcirc-server-alist '(("irc.freenode.net" :channels ("#emacs")))
           rcirc-buffer-maximum-lines 10000
           rcirc-kill-channel-buffers t)
-          
 
     (set-face-foreground 'rcirc-my-nick "yellow" nil)
-    (add-to-list 'window-size-change-functions 'dim:dynamic-fill-column)
     (add-hook 'rcirc-mode-hook #'flyspell-mode)
+    (add-hook 'rcirc-mode-hook #'visual-line-mode)
     (rcirc-track-minor-mode))
 #+END_SRC
 
@@ -939,7 +929,9 @@ or where remapping them is intractable (such as grave/hyper).
              ("M-'"   . insert-pair)
              ("M-["   . insert-pair)
              ("M-{"   . insert-pair)
+
              ("C-c C-'" . (lambda () (interactive) (insert "`")))
+             ("C-c \"" . (lambda () (interactive) (insert "~")))
 
              ("C-c q" . auto-fill-mode)
 
@@ -1103,6 +1095,22 @@ So I add this to the mode hook to ensure it's done every time.
        (add-to-list 'gnus-article-mode-hook 'gnus-article-fill-long-lines)))
 #+END_SRC
 
+** View-mode adjustments
+
+View mode doesn't provide for wrapping long lines, which is annoying. I'd like
+to ensure that it does so, so I provide a hook for this.
+
+#+BEGIN_SRC emacs-lisp
+  (defun jtg:wrap-lines-hook ()
+    "Wraps long lines by setting truncate-lines to nil and enabling visual line
+  mode (if available)"
+    (setq truncate-lines nil
+          word-wrap t)
+    (visual-line-mode))
+
+  (add-hook 'view-mode-hook #'jtg:wrap-lines-hook)
+#+END_SRC
+
 ** Misc settings
 
 #+BEGIN_SRC emacs-lisp
@@ -1230,13 +1238,26 @@ I prefer the Google C style when possible.
        (setq-default c-indent-level 4
                      c-basic-offset 4
                      c-syntactic-indentation t)
+       (c-set-offset 'inclass '++)
+       (c-set-offset 'access-label '-)
        (c-set-offset 'case-label '+)
-       (c-set-offset 'access-label '-2)
        (c-set-offset 'innamespace '0)
+       (c-set-offset 'inextern-lang '0)
+       (c-set-offset 'inclass '++)
 
-       (add-hook 'c-mode-common-hook #'fci-mode)
-       (add-hook 'c-mode-common-hook #'linum-mode)
+       (bind-key "C-c o" #'ff-find-other-file c-mode-map)
+       (bind-key "C-c o" #'ff-find-other-file c++-mode-map)
+
        (add-hook 'c-mode-common-hook #'auto-fill-mode)))
+#+END_SRC
+
+*** Objective-C
+
+Add objc-mode support for objc++ files since there's no actual mode for it, and
+objc-mode comes close.
+
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'auto-mode-alist '("\\.mm\\'" . objc-mode))
 #+END_SRC
 
 ** Common lisp programming                                             :lisp:

@@ -13,3 +13,5 @@ savehist
 /.#ede-projects.el
 /bookmarks
 /tramp
+/custom.el
+/games/
