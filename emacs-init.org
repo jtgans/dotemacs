@@ -1280,10 +1280,12 @@ Steps to setup the SLIME helper for SBCL:
   (load (expand-file-name "~/quicklisp/slime-helper.el") t)
 
   (if (boundp 'inferior-lisp-program)
-      (cond ((or (eq system-type 'darwin)
-                 (eq system-type 'berkeley-unix))
-             (setq-default inferior-lisp-program "/usr/local/bin/sbcl"))
-            (t (setq-default inferior-lisp-program "/usr/bin/sbcl"))))
+      (progn
+        (cond ((or (eq system-type 'darwin)
+                   (eq system-type 'berkeley-unix))
+               (setq-default inferior-lisp-program "/usr/local/bin/sbcl"))
+              (t (setq-default inferior-lisp-program "/usr/bin/sbcl")))
+        (setq slime-load-failed-fasl 'never)))
 #+END_SRC
 
 **** Keybinding breakages
