@@ -1295,7 +1295,7 @@ Steps to setup the SLIME helper for SBCL:
   ;; expression, and it shadows my global def for my keymap.
   (defun jtg:remove-slime-eval-last-expr ()
     "Removes SLIME's C-c C-j key binding in deference to my own."
-    (define-key slime-mode-map "C-c C-j" nil))
+    (define-key slime-mode-map (kbd "C-c C-j") nil))
 
   (add-hook 'slime-mode-hook 'jtg:remove-slime-eval-last-expr)
 #+END_SRC
