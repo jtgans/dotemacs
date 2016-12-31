@@ -407,13 +407,6 @@ instead to check if it's available and install it directly if not.
     :ensure)
 #+END_SRC
 
-**** magit-push-remote
-
-#+BEGIN_SRC emacs-lisp
-  (use-package magit-push-remote
-    :ensure)
-#+END_SRC
-
 *** GNU Global Tags                                                  :ggtags:
 
 #+BEGIN_SRC emacs-lisp
